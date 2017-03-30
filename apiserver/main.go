@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/AustinSmart/challenges-AustinSmart/apiserver/handlers"
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/handlers"
 )
 
 const defaultPort = "80"
@@ -31,7 +31,7 @@ func main() {
 	//add your handlers.SummaryHandler function as a handler
 	//for the apiSummary route
 	//HINT: https://golang.org/pkg/net/http/#HandleFunc
-	http.HandleFunc("/summary", handlers.SummaryHandler)
+	http.HandleFunc(apiSummary, handlers.SummaryHandler)
 
 	//start your web server and use log.Fatal() to log
 	//any errors that occur if the server can't start

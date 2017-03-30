@@ -64,6 +64,7 @@ func getPageSummary(url string) (openGraphProps, error) {
 		token := tokenizer.Token()
 
 		if tokenType == html.ErrorToken {
+			// Returning io.EOF indicates success.
 			if tokenizer.Err() == io.EOF {
 				return openGraphMap, nil
 			}

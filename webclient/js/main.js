@@ -21,6 +21,7 @@ function search() {
             title.innerHTML = data.title;
             description.innerHTML = data.description;
             image.src = data.image;
+            imageDiv.innerHTML = "";
             imageDiv.appendChild(image);
             console.log(data)
         }).catch(function (err) {

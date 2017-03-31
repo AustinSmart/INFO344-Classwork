@@ -18,13 +18,25 @@ function search() {
             return resp.json()
         }).then(function (data) {
             results.style.display = "inherit"
-            title.innerHTML = data.title;
-            description.innerHTML = data.description;
-            image.src = data.image;
-            imageDiv.innerHTML = "";
-            imageDiv.appendChild(image);
-            console.log(data)
+
+            if (data.title)
+                title.innerHTML = data.title;
+            else
+                title.innerHTML = "No OpenGraph title property"
+
+            if (data.description)
+                description.innerHTML = data.description;
+            else
+                description.innerHTML = "No OpenGraph description property"
+
+            if (data.image) {
+                image.src = data.image;
+                imageDiv.innerHTML = "";
+                imageDiv.appendChild(image);
+            } else
+                imageDiv.innerHTML = "Image not found"
+
         }).catch(function (err) {
-            console.error(err)
+            window.alert(err);
         });
 }

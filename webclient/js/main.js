@@ -8,6 +8,7 @@ function search() {
     var title = document.getElementById("title")
     var description = document.getElementById("description")
     var image = document.createElement("img");
+    image.setAttribute("style", "max-width: 200px; max-height: 200px;");
     var imageDiv = document.getElementById("image-div");
     var results = document.getElementById("results");
 

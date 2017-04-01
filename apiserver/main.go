@@ -9,14 +9,11 @@ import (
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/handlers"
 )
 
-const defaultPort = "80"
-
 const (
 	apiRoot    = "/v1/"
 	apiSummary = apiRoot + "summary"
 )
 
-//main is the main entry point for this program
 func main() {
 	//get the host and port from environment variables
 	port := os.Getenv("PORT")
@@ -26,11 +23,9 @@ func main() {
 	host := os.Getenv("HOST")
 	addr := fmt.Sprintf("%s:%s", host, port)
 
-	//get the TLS key and cert paths from environment variables
-	//this allows us to use a self-signed cert/key during development
-	//and the Let's Encrypt cert/key in production
-	tlsKeyPath := "/etc/info344.austinsmart.com.key"
-	tlsCertPath := "/etc/info344.austinsmart.com.pem"
+	//get cloudflare origin cert and key
+	tlsKeyPath := os.Getenv("TLSKEY")
+	tlsCertPath := os.Getenv("TLSCERT")
 
 	http.HandleFunc(apiSummary, handlers.SummaryHandler)
 

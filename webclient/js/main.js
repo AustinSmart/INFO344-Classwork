@@ -1,10 +1,9 @@
 "use strict";
 
-const API = "http://api.info344.austinsmart.com/v1/summary?url=";
+const API = "https://info344api.austinsmart.com/v1/summary?url=";
 
 var form = document.getElementById("search-form");
 form.addEventListener("submit", function (e) {
-    console.log("CLICK");
     e.preventDefault();
     search();
 });

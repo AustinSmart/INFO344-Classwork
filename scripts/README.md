@@ -25,7 +25,7 @@
 
 >Returns DNS records of requested type for austinsmart.com
 >  *  Params:
->    * 1: Record type (returns all records if not supplied)
+>     * 1: Record type (returns all records if not supplied)
 
 ### get_droplets.sh
 

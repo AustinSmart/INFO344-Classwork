@@ -6,4 +6,6 @@ curl -sS -X POST "https://api.digitalocean.com/v2/load_balancers/dfc8c5be-a4ae-4
     -H "Content-Type: application/json" \
     -H "Authorization: Bearer $DOTOKEN" \
     -d '{"droplet_ids": ['$1']}' 
+
+echo Droplet $1 added
  

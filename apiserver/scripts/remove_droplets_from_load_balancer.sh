@@ -11,7 +11,7 @@ read destroy
 
 if([ "$droplet" != "" ]) then
     curl -X DELETE "https://api.digitalocean.com/v2/load_balancers/dfc8c5be-a4ae-4fdb-9e70-6c4a11999e59/droplets" \
-        -H "Authorization: Bearer $TOKEN" \
+        -H "Authorization: Bearer $DOTOKEN" \
         -H "Content-Type: application/json" \
         -d '{"droplet_ids": ['$droplet']}' 
 else
@@ -20,6 +20,6 @@ fi
 
 if([ "$destroy" == "y" ]  || [ "$destroy" == "yes" ]) then
     curl -X DELETE "https://api.digitalocean.com/v2/droplets/$droplet" \
-        -H "Authorization: Bearer $TOKEN" \
+        -H "Authorization: Bearer $DOTOKEN" \
         -H "Content-Type: application/json" 
 fi

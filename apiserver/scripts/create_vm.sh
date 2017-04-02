@@ -6,7 +6,7 @@
 
 # Create a new Ubuntu 16.04 x64 VM in the SFO1 region with 512mb of RAM named $1
 droplet_id=$(curl -X POST "https://api.digitalocean.com/v2/droplets" \
-    -H "Authorization: Bearer $TOKEN" \
+    -H "Authorization: Bearer $DOTOKEN" \
     -H "Content-Type: application/json" \
     -d'{"name":"'$1'","region":"sfo2","size":"512mb","image":"ubuntu-16-04-x64",
 
@@ -25,7 +25,7 @@ status=""
 while [ "$status" != "active" ]
 do
     status=$(curl -X GET  "https://api.digitalocean.com/v2/droplets/$droplet_id" \
-        -H "Authorization: Bearer $TOKEN" \
+        -H "Authorization: Bearer $DOTOKEN" \
         -H "Content-Type: application/json" | jq -r '.droplet.status')
     sleep 10
 done

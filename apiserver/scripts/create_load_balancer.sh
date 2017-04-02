@@ -3,7 +3,7 @@
 # $1: Load balancer name
 
 curl -X POST  "https://api.digitalocean.com/v2/load_balancers" \
-    -H "Authorization: Bearer $TOKEN" \
+    -H "Authorization: Bearer $DOTOKEN" \
     -H "Content-Type: application/json" \
     -d '{"name": "'$1'",
         "region": "sfo2",

@@ -15,5 +15,5 @@ docker stop apiserver
 docker rm apiserver
 docker pull austinsmart/info344apiserver:latest
 docker run --name apiserver -p 443:443 -v /etc/info344api.austinsmart.com.pem:/etc/info344api.austinsmart.com.pem -v /etc/info344api.austinsmart.com.key:/etc/info344api.austinsmart.com.key -e TLSCERT=/etc/info344api.austinsmart.com.pem -e TLSKEY=/etc/info344api.austinsmart.com.key -d austinsmart/info344apiserver
-docker ps
+docker ps -a
 '

@@ -1,4 +1,11 @@
-# Digital Ocean deployment scripts
+# Scripts
+
+### add_droplet_to_load_balancer.sh
+
+Adds droplet to hardcoded load balancer
+  * Param: 
+    * 1: Droplet id's (CSV)
+
 
 ### create_load_balancer.sh
 
@@ -13,12 +20,12 @@ Creates a new VM, starts a docker container, and adds to the hardcoded load bala
     * 1: VM name 
     * 2: Docker container name
     * 3: Docker image name
+    
+### dns.sh
 
-### add_droplet_to_load_balancer.sh
-
-Adds droplet to hardcoded load balancer
-  * Param: 
-    * 1: Droplet id's (CSV)
+Returns DNS records of requested type for austinsmart.com
+  *  Params:
+    * 1: Record type (returns all records if not supplied)
 
 ### get_droplets.sh
 
@@ -33,4 +40,9 @@ Returns the requested load balancer
 ### remove_droplets_from_load_balancer.sh
 
 Gets first load balancer for current API token and prompts for removal/destruction of droplets from it
+
+### verify_ssl.sh
+
+Returns status of SSL for primary DNS zone of austinsmart.com
+
 

@@ -26,28 +26,29 @@ echo Droplet created: $droplet_id
 addlb=false
 
 while [ "$1" != "" ]; do
-    if ([ "$1" == "-lb" ]) then
-        addlb=true
-        echo lb found
-    fi
+    case $1 in
+        -lb ) addlb=true
+    esac
     shift
 done
 
-# Wait until the droplet status is "active" and then add it to the load balancer
-status=""
+if ([ $addlb == true ]) then
 
-while [ "$status" != "active" ]
-do
-    status=$(curl -sS  -X GET  "https://api.digitalocean.com/v2/droplets/$droplet_id" \
-        -H "Authorization: Bearer $DOTOKEN" \
-        -H "Content-Type: application/json" | jq -r '.droplet.status')
+    # Wait until the droplet status is "active" and then add it to the load balancer
+    status=""
+    while [ "$status" != "active" ]
+    do
+        status=$(curl -sS  -X GET  "https://api.digitalocean.com/v2/droplets/$droplet_id" \
+            -H "Authorization: Bearer $DOTOKEN" \
+            -H "Content-Type: application/json" | jq -r '.droplet.status')
 
-    echo "Waiting for Droplet to come online"
-    
-    sleep 10
-done
+        echo "Waiting for Droplet to come online"
+        
+        sleep 10
+    done
 
-sh ./add_droplet_to_load_balancer.sh $droplet_id
+    sh ./add_droplet_to_load_balancer.sh $droplet_id
+fi
 
 
 

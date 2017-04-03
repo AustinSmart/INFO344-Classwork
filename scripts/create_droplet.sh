@@ -3,7 +3,7 @@
 # $1: VM name
 # $2: docker container name
 # $3: docker image name
-# $4: if $@ == -lb, will add to loadbalancer
+# $@: -lb will add to loadbalancer
 
 # Create a new Ubuntu 16.04 x64 VM in the SFO1 region with 512mb of RAM named $1
 droplet_id=$(curl -sS  -X POST "https://api.digitalocean.com/v2/droplets" \

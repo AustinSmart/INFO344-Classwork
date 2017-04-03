@@ -3,7 +3,7 @@
 # $1: VM name
 # $2: docker container name
 # $3: docker image name
-# $4: if == addlb, will add to loadbalancer
+# $4: if $@ == -lb, will add to loadbalancer
 
 # Create a new Ubuntu 16.04 x64 VM in the SFO1 region with 512mb of RAM named $1
 droplet_id=$(curl -sS  -X POST "https://api.digitalocean.com/v2/droplets" \
@@ -23,9 +23,15 @@ runcmd:
 echo Droplet created: $droplet_id
 
 # Check if adding to load balancer
-if ([ "$4" == "addlb" ]) then
+addlb=false
 
-echo Adding to Load Balancer
+while [ "$1" != "" ]; do
+    if ([ "$1" == "-lb" ]) then
+        addlb=true
+        echo lb found
+    fi
+    shift
+done
 
 # Wait until the droplet status is "active" and then add it to the load balancer
 status=""
@@ -43,7 +49,6 @@ done
 
 sh ./add_droplet_to_load_balancer.sh $droplet_id
 
-fi
 
 
 

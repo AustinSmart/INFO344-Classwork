@@ -6,7 +6,6 @@
 >  * Param: 
 >    * 1: Droplet id's (CSV)
 
-
 ### create_load_balancer.sh
 
 >Creates a new load balancer

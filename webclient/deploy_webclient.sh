@@ -6,11 +6,11 @@ docker build -t austinsmart/info344webclient . --no-cache
 # Push the docker container
 docker push austinsmart/info344webclient:latest
 
-# SSH. root = bad
-ssh root@138.68.41.64 ' 
-docker stop webclient
-docker rm webclient
-docker pull austinsmart/info344webclient:latest
-docker run --name webclient -p 443:443 -p 80:80 -v /etc/info344.austinsmart.com.pem:/etc/info344.austinsmart.com.pem -v /etc/info344.austinsmart.com.key:/etc/info344.austinsmart.com.key -dt austinsmart/info344webclient
-docker ps -a
+# SSH
+ssh austin@138.68.41.64 ' 
+sudo docker stop webclient
+sudo docker rm webclient
+sudo docker pull austinsmart/info344webclient:latest
+sudo docker run --name webclient -p 443:443 -p 80:80 -v /etc/info344.austinsmart.com.pem:/etc/info344.austinsmart.com.pem:ro -v /etc/info344.austinsmart.com.key:/etc/info344.austinsmart.com.key:ro -dt austinsmart/info344webclient
+sudo docker ps -a
 '

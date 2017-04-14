@@ -1,71 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u"
-        crossorigin="anonymous">
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp"
-        crossorigin="anonymous">
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-
-    <!-- Latest compiled and minified CSS -->
+    <meta charset="UTF-8">
+    <title>Taut</title>
+    <link rel="icon" href="img/favicon.ico">
     
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-        crossorigin="anonymous"></script>
+    <!--Material Design Lite -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue_grey-orange.min.css" />
+    <link rel="stylesheet" href="css/main.css">  
 
-    <script defer type="text/javascript" src="js/main.js"></script>
-
-    <title>INFO 344</title>
+    <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+    <script defer src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+    <script defer src="lib/md5.min.js"></script>
+    <script defer src="js/common.js"></script>
+    <script defer src="js/signin.js"></script>  
 </head>
-
 <body>
-    <!-- Jumbotron -->
-    <div class="jumbotron">
-        <div class="container">
-            <h1>Hello!</h1>
-            <p>Search for the Open Graph properties of a URL</p>
-            <div class="col-lg-3">
-                <form id="search-form" class="form-inline">
-                    <div class="form-group">
-                        <div class="input-group">
-                            <input id="input" type="url" class="form-control" placeholder="Search for...">
-                            <span class="input-group-btn">
-                            <button id="search-button" class="btn btn-default" type="submit"  value="Submit">Go!</button>
-                        </span>
+    <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner spinner" id="spinner"></div>
+    <div class="mdl-layout mdl-js-layout mdl-color--grey-500 centered">
+	        <div class="mdl-layout__content">
+		        <div class="mdl-card mdl-shadow--6dp">
+			        <div class="mdl-card__title mdl-color--primary mdl-color-text--white">
+				        <h2 class="mdl-card__title-text">Taut</h2>
+			        </div>
+	  	            <div class="mdl-card__supporting-text">
+                        <div class="">
+                            <h1>Sign In</h1>
                         </div>
-                        <!-- /input-group -->
+                        <form id="signin-form">
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="email" id="email-input" />
+                                <label class="mdl-textfield__label" for="email-input">Email</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="password" id="password-input" pattern=".{6,}"/>
+                                <label class="mdl-textfield__label" for="password-input">Password</label>
+                                <span class="mdl-textfield__error">Passwords must be 6 characters minimum!</span>
+                            </div> 
+                            <div class="mdl-card--border">
+                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Sign In</button>
+                            </div>
+                            <div>
+                                Don't yet have an account? <a href="signup.html">Sign Up</a>
+                            </div>
+                        </form>
                     </div>
-                    <!-- /form-group -->
-                </form>
-                <!-- /form -->
+                </div>
             </div>
-            <!-- /col-lg-6 -->
         </div>
-        <!-- /container -->
-    </div>
-    <!-- /jumbotron -->
-    <div class="container" id="results" style="display: none;">
-        <div class="col-lg-3" id="image-div">
-           
+            <p>Don't yet have an account? <a href="signup.html">Sign Up</a></p>
         </div>
-        <div class="col-lg-3">
-            <h4>Title</h4><p id="title"></p>
-        </div>
-        <div class="col-lg-3">
-            <h4>Description</h4><p id="description"></p>
-        </div>
-    </div>
-    <!-- /container -->
-
-</body>
-
+    </body>
 </html>

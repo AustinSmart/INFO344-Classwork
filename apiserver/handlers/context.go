@@ -9,5 +9,5 @@ import (
 type Context struct {
 	SessionKey   string
 	SessionStore sessions.Store
-	userStore    users.Store
+	UserStore    users.Store
 }

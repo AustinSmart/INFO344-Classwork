@@ -25,37 +25,6 @@ var ErrInvalidID = errors.New("Invalid Session ID")
 //using `signingKey` as the HMAC signing key. An error is returned only
 //if there was an error generating random bytes for the session ID
 func NewSessionID(signingKey string) (SessionID, error) {
-	//make a byte slice of length `signedLength`
-
-	// r := make([]byte, signedLength)//whole id
-	// v := make([]byte, idLength)//value
-
-	// //use the crypto/rand package to read `idLength`
-	// //random bytes into the first part of that byte slice
-	// //this will be our new session ID
-	// //if you get an error, return InvalidSessionID and
-	// //the error
-
-	// _, err := rand.Read(v)//value
-	// if err != nil {
-	// 	fmt.Println("error generating sessionID: ", err.Error())
-	// 	return InvalidSessionID, err
-	// }
-	// copy(r, v)//copy value to beginning of whole id
-
-	// //use the crypto/hmac package to generate a new
-	// //Message Authentication Code (MAC) for the new
-	// //session ID, using the provided signing key,
-	// //and put it in the last part of the byte slice
-	// w := make([]byte, sha256.Size)
-	// h := hmac.New(sha256.New, []byte(signingKey))
-	// h.Write(w)
-	// copy(r[len(v):], w)
-
-	// //use the encoding/base64 package to encode the
-	// //byte slice into a base64.URLEncoding
-	// //and return the result as a new SessionID
-	// encodedID := base64.URLEncoding.EncodeToString(r)
 
 	v := make([]byte, signedLength)
 	_, err := rand.Read(v)

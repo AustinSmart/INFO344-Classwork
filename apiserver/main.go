@@ -1,5 +1,14 @@
 package main
 
+import (
+	"fmt"
+	"log"
+	"net/http"
+	"os"
+
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/handlers"
+)
+
 const defaultPort = "80"
 
 const (
@@ -13,13 +22,21 @@ func main() {
 	//when initializing and starting your web server
 	// PORT - port number to listen on for HTTP requests (if not set, use defaultPort)
 	// HOST - host address to respond to (if not set, leave empty, which means any host)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = defaultPort
+	}
+	host := os.Getenv("HOST")
 
 	//add your handlers.SummaryHandler function as a handler
 	//for the apiSummary route
 	//HINT: https://golang.org/pkg/net/http/#HandleFunc
+	http.HandleFunc(apiSummary, handlers.SummaryHandler)
 
 	//start your web server and use log.Fatal() to log
 	//any errors that occur if the server can't start
 	//HINT: https://golang.org/pkg/net/http/#ListenAndServe
-
+	addr := host + ":" + port
+	fmt.Printf("server is listening at %s:%s...\n", host, port)
+	log.Fatal(http.ListenAndServe(addr, nil))
 }

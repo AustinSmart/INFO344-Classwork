@@ -112,6 +112,7 @@ func SummaryHandler(w http.ResponseWriter, r *http.Request) {
 	//HINT: https://golang.org/pkg/net/http/#Error
 	if url == "" {
 		http.Error(w, "Bad Request: ", http.StatusBadRequest)
+		return
 	} else {
 
 		//call getPageSummary() passing the requested URL
@@ -123,6 +124,7 @@ func SummaryHandler(w http.ResponseWriter, r *http.Request) {
 		//with that error and an http.StatusBadRequest code
 		if err != nil {
 			http.Error(w, "Summary retuend with an error: "+err.Error(), http.StatusBadRequest)
+			return
 		}
 
 		//otherwise, respond by writing the openGrahProps

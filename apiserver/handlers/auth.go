@@ -17,6 +17,7 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 		err := r.ParseForm
 		if err != nil {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
 		}
 		nu := users.NewUser{
 			Email:        r.PostFormValue("email"),
@@ -30,35 +31,42 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 		err = nu.Validate
 		if err != nil {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
+			return
 		}
 
 		_, err1 := ctx.UserStore.GetByEmail(nu.Email)
 		if err1 != nil {
 			http.Error(w, "Email already exists in store", http.StatusBadRequest)
+			return
 		}
 
 		_, err1 = ctx.UserStore.GetByUserName(nu.UserName)
 		if err1 != nil {
 			http.Error(w, "Username already exists in store", http.StatusBadRequest)
+			return
 		}
 
 		u, err1 := ctx.UserStore.Insert(&nu)
 		if err1 != nil {
 			http.Error(w, "Error saving user", http.StatusInternalServerError)
+			return
 		}
 		_, err1 = sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, nil, w)
 		if err1 != nil {
-			http.Error(w, "Error starting session", http.StatusInternalServerError)
+			http.Error(w, "Session error", http.StatusInternalServerError)
+			return
 		}
 
 		ju, err1 := json.Marshal(u)
 		if err1 != nil {
 			http.Error(w, "JSON error", http.StatusInternalServerError)
+			return
 		}
 
 		_, err1 = w.Write(ju)
 		if err1 != nil {
 			http.Error(w, "Error writing response", http.StatusInternalServerError)
+			return
 		}
 	}
 	if r.Method == "GET" {
@@ -67,11 +75,13 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 		ju, err := json.Marshal(u)
 		if err != nil {
 			http.Error(w, "JSON error", http.StatusInternalServerError)
+			return
 		}
 
 		_, err = w.Write(ju)
 		if err != nil {
 			http.Error(w, "Error writing response", http.StatusInternalServerError)
+			return
 		}
 	}
 }
@@ -80,6 +90,7 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Request type must be POST", http.StatusBadRequest)
+		return
 	}
 
 	c := users.Credentials{
@@ -90,11 +101,13 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	u, err := ctx.UserStore.GetByEmail(c.Email)
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
 	}
 
 	err = u.Authenticate(c.Password)
 	if err != nil {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
 	}
 
 	sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, nil, w)
@@ -102,11 +115,13 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	ju, err1 := json.Marshal(u)
 	if err1 != nil {
 		http.Error(w, "JSON error", http.StatusInternalServerError)
+		return
 	}
 
 	_, err1 = w.Write(ju)
 	if err1 != nil {
 		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -114,10 +129,11 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 func (ctx *Context) SessionsMineHandler(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "DELETE" {
 		http.Error(w, "Request type must be DELETE", http.StatusBadRequest)
+		return
 	}
 
 	sid, err := sessions.EndSession(r, ctx.SessionKey, ctx.SessionStore)
-	if err != nil {
+	if err == nil {
 		w.Write([]byte(fmt.Sprintf("User %s has been signed out", sid)))
 	}
 }
@@ -127,6 +143,7 @@ func (ctx *Context) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
 	_, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, nil)
 	if err != nil {
 		http.Error(w, "Error retrieving state", http.StatusInternalServerError)
+		return
 	}
 
 	//TODO: Respond to the client with the session state's User field, encoded as a JSON object

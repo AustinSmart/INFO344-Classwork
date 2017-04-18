@@ -13,7 +13,8 @@ import (
 
 // UsersHandler adds and returns a new user if the request type is POST, returns all users if the request type is GET
 func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "POST" {
+	switch r.Method {
+	case "POST":
 		err := r.ParseForm
 		if err != nil {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
@@ -36,13 +37,13 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 
 		_, err1 := ctx.UserStore.GetByEmail(nu.Email)
 		if err1 != nil {
-			http.Error(w, "Email already exists in store", http.StatusBadRequest)
+			http.Error(w, "Email already exists", http.StatusBadRequest)
 			return
 		}
 
 		_, err1 = ctx.UserStore.GetByUserName(nu.UserName)
 		if err1 != nil {
-			http.Error(w, "Username already exists in store", http.StatusBadRequest)
+			http.Error(w, "Username already exists", http.StatusBadRequest)
 			return
 		}
 
@@ -51,38 +52,20 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error saving user", http.StatusInternalServerError)
 			return
 		}
-		_, err1 = sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, nil, w)
+		s := &SessionState{}
+		_, err1 = sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, s, w)
 		if err1 != nil {
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
-
-		ju, err1 := json.Marshal(u)
-		if err1 != nil {
-			http.Error(w, "JSON error", http.StatusInternalServerError)
-			return
-		}
-
-		_, err1 = w.Write(ju)
-		if err1 != nil {
-			http.Error(w, "Error writing response", http.StatusInternalServerError)
-			return
-		}
-	}
-	if r.Method == "GET" {
+		marshalResponse(w, u)
+	case "GET":
 		u, err := ctx.UserStore.GetAll()
-
-		ju, err := json.Marshal(u)
 		if err != nil {
-			http.Error(w, "JSON error", http.StatusInternalServerError)
+			http.Error(w, "Error retrieving users", http.StatusInternalServerError)
 			return
 		}
-
-		_, err = w.Write(ju)
-		if err != nil {
-			http.Error(w, "Error writing response", http.StatusInternalServerError)
-			return
-		}
+		marshalResponse(w, u)
 	}
 }
 
@@ -109,20 +92,10 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
+	s := &SessionState{}
+	sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, s, w)
 
-	sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, nil, w)
-
-	ju, err1 := json.Marshal(u)
-	if err1 != nil {
-		http.Error(w, "JSON error", http.StatusInternalServerError)
-		return
-	}
-
-	_, err1 = w.Write(ju)
-	if err1 != nil {
-		http.Error(w, "Error writing response", http.StatusInternalServerError)
-		return
-	}
+	marshalResponse(w, u)
 }
 
 // SessionsMineHandler allows authenticated users to sign out
@@ -140,13 +113,26 @@ func (ctx *Context) SessionsMineHandler(w http.ResponseWriter, r *http.Request) 
 
 // UsersMeHandler responds with the session state
 func (ctx *Context) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
-	_, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, nil)
+	s := &SessionState{}
+	_, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, s)
 	if err != nil {
 		http.Error(w, "Error retrieving state", http.StatusInternalServerError)
 		return
 	}
 
-	//TODO: Respond to the client with the session state's User field, encoded as a JSON object
+	marshalResponse(w, s.User)
 }
 
-//TODO: Change state accesses to something other than nil. most likely after MongoDB store is implemented.
+func marshalResponse(w http.ResponseWriter, data interface{}) {
+	jdata, err1 := json.Marshal(data)
+	if err1 != nil {
+		http.Error(w, "JSON error", http.StatusInternalServerError)
+		return
+	}
+
+	_, err1 = w.Write(jdata)
+	if err1 != nil {
+		http.Error(w, "Error writing response", http.StatusInternalServerError)
+		return
+	}
+}

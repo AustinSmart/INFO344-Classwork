@@ -20,10 +20,10 @@ func TestCRUD(t *testing.T) {
 	}
 
 	nu := &NewUser{
-		Email:        "test@test.com",
-		UserName:     "tester",
-		FirstName:    "Test",
-		LastName:     "Tester",
+		Email:        "austin@austinsmart.com",
+		UserName:     "AustinSmart",
+		FirstName:    "Austin",
+		LastName:     "Smart",
 		Password:     "password",
 		PasswordConf: "password",
 	}
@@ -76,8 +76,8 @@ func TestCRUD(t *testing.T) {
 	}
 
 	upd := &UserUpdates{
-		FirstName: "UPDATED Test",
-		LastName:  "UPDATED Tester",
+		FirstName: "UPDATED Austin",
+		LastName:  "UPDATED Smart",
 	}
 	if err := store.Update(upd, u); err != nil {
 		t.Errorf("error updating user: %v\n", err)
@@ -87,10 +87,10 @@ func TestCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("error getting updated user by ID: %v\n", err)
 	}
-	if u3.FirstName != "UPDATED Test" {
+	if u3.FirstName != "UPDATED Austin" {
 		t.Errorf("FirstName field not updated: expected `UPDATED Test` but got `%s`\n", u.FirstName)
 	}
-	if u3.LastName != "UPDATED Tester" {
+	if u3.LastName != "UPDATED Smart" {
 		t.Errorf("FirstName field not updated: expected `UPDATED Tester` but got `%s`\n", u.LastName)
 	}
 

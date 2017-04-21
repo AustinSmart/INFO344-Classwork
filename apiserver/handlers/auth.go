@@ -11,38 +11,45 @@ import (
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/sessions"
 )
 
+const (
+	headerContentType   = "Content-Type"
+	charsetUTF8         = "charset=utf-8"
+	contentTypeJSON     = "application/json"
+	contentTypeJSONUTF8 = contentTypeJSON + "; " + charsetUTF8
+)
+
 // UsersHandler adds and returns a new user if the request type is POST, returns all users if the request type is GET
 func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
-		err := r.ParseForm
+		err := r.ParseForm()
 		if err != nil {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 		nu := users.NewUser{
-			Email:        r.PostFormValue("email"),
-			Password:     r.PostFormValue("password"),
-			PasswordConf: r.PostFormValue("passwordconf"),
-			UserName:     r.PostFormValue("username"),
-			FirstName:    r.PostFormValue("firstname"),
-			LastName:     r.PostFormValue("lastname"),
+			Email:        r.FormValue("email"),
+			Password:     r.FormValue("password"),
+			PasswordConf: r.FormValue("passwordconf"),
+			UserName:     r.FormValue("username"),
+			FirstName:    r.FormValue("firstname"),
+			LastName:     r.FormValue("lastname"),
 		}
 
-		err = nu.Validate
+		err = nu.Validate()
 		if err != nil {
 			http.Error(w, "Bad Request", http.StatusBadRequest)
 			return
 		}
 
-		_, err1 := ctx.UserStore.GetByEmail(nu.Email)
-		if err1 != nil {
+		u, _ := ctx.UserStore.GetByEmail(nu.Email)
+		if u != nil {
 			http.Error(w, "Email already exists", http.StatusBadRequest)
 			return
 		}
 
-		_, err1 = ctx.UserStore.GetByUserName(nu.UserName)
-		if err1 != nil {
+		u, _ = ctx.UserStore.GetByUserName(nu.UserName)
+		if u != nil {
 			http.Error(w, "Username already exists", http.StatusBadRequest)
 			return
 		}
@@ -58,14 +65,14 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Session error", http.StatusInternalServerError)
 			return
 		}
-		marshalResponse(w, u)
+		respond(w, u)
 	case "GET":
 		u, err := ctx.UserStore.GetAll()
 		if err != nil {
 			http.Error(w, "Error retrieving users", http.StatusInternalServerError)
 			return
 		}
-		marshalResponse(w, u)
+		respond(w, u)
 	}
 }
 
@@ -77,8 +84,8 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := users.Credentials{
-		Email:    r.PostFormValue("email"),
-		Password: r.PostFormValue("password"),
+		Email:    r.FormValue("email"),
+		Password: r.FormValue("password"),
 	}
 
 	u, err := ctx.UserStore.GetByEmail(c.Email)
@@ -95,7 +102,7 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 	s := &SessionState{}
 	sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, s, w)
 
-	marshalResponse(w, u)
+	respond(w, u)
 }
 
 // SessionsMineHandler allows authenticated users to sign out
@@ -108,6 +115,9 @@ func (ctx *Context) SessionsMineHandler(w http.ResponseWriter, r *http.Request) 
 	sid, err := sessions.EndSession(r, ctx.SessionKey, ctx.SessionStore)
 	if err == nil {
 		w.Write([]byte(fmt.Sprintf("User %s has been signed out", sid)))
+	} else {
+		http.Error(w, "Error signing out", http.StatusInternalServerError)
+		return
 	}
 }
 
@@ -119,20 +129,11 @@ func (ctx *Context) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error retrieving state", http.StatusInternalServerError)
 		return
 	}
-
-	marshalResponse(w, s.User)
+	respond(w, s.User)
 }
 
-func marshalResponse(w http.ResponseWriter, data interface{}) {
-	jdata, err1 := json.Marshal(data)
-	if err1 != nil {
-		http.Error(w, "JSON error", http.StatusInternalServerError)
-		return
-	}
-
-	_, err1 = w.Write(jdata)
-	if err1 != nil {
-		http.Error(w, "Error writing response", http.StatusInternalServerError)
-		return
-	}
+func respond(w http.ResponseWriter, data interface{}) {
+	w.Header().Add(headerContentType, contentTypeJSONUTF8)
+	encoder := json.NewEncoder(w)
+	encoder.Encode(data)
 }

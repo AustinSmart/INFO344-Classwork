@@ -52,7 +52,7 @@ func ValidateID(id string, signingKey string) (SessionID, error) {
 	//if you get an error, return InvalidSessionID and the error
 	decodedID, err := base64.URLEncoding.DecodeString(id)
 	if err != nil {
-		fmt.Println("eror encoding sessionID:  " + err.Error())
+		fmt.Println("eror decoding sessionID:  " + err.Error())
 	}
 	//if the byte slice length is < signedLength
 	//it must be invalid, so return InvalidSessionID

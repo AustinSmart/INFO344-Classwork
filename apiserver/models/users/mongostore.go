@@ -16,7 +16,10 @@ type MongoStore struct {
 func (ms *MongoStore) GetAll() ([]*User, error) {
 	users := []*User{}
 	err := ms.Session.DB(ms.DatabaseName).C(ms.CollectionName).Find(nil).All(&users)
-	return users, err
+	if err != nil {
+		return nil, err
+	}
+	return users, nil
 }
 
 // GetByID returns the User with the given ID

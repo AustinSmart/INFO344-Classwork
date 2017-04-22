@@ -9,34 +9,27 @@ import (
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/handlers"
 )
 
-const defaultPort = "80"
-
 const (
 	apiRoot    = "/v1/"
 	apiSummary = apiRoot + "summary"
 )
 
-//main is the main entry point for this program
 func main() {
-	//read and use the following environment variables
-	//when initializing and starting your web server
-	// PORT - port number to listen on for HTTP requests (if not set, use defaultPort)
-	// HOST - host address to respond to (if not set, leave empty, which means any host)
+	//get the host and port from environment variables
 	port := os.Getenv("PORT")
-	if port == "" {
-		port = defaultPort
+	if len(port) == 0 {
+		port = "443"
 	}
 	host := os.Getenv("HOST")
+	addr := fmt.Sprintf("%s:%s", host, port)
 
-	//add your handlers.SummaryHandler function as a handler
-	//for the apiSummary route
-	//HINT: https://golang.org/pkg/net/http/#HandleFunc
+	//get cloudflare origin cert and key
+	tlsKeyPath := os.Getenv("TLSKEY")
+	tlsCertPath := os.Getenv("TLSCERT")
+
 	http.HandleFunc(apiSummary, handlers.SummaryHandler)
 
-	//start your web server and use log.Fatal() to log
-	//any errors that occur if the server can't start
-	//HINT: https://golang.org/pkg/net/http/#ListenAndServe
-	addr := host + ":" + port
-	fmt.Printf("server is listening at %s:%s...\n", host, port)
-	log.Fatal(http.ListenAndServe(addr, nil))
+	//start the server
+	fmt.Printf("listening on %s...\n", addr)
+	log.Fatal(http.ListenAndServeTLS(addr, tlsCertPath, tlsKeyPath, nil))
 }

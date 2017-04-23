@@ -13,6 +13,16 @@
 >  * Param: 
 >    * 1: Name of new load balancer
   
+
+### create_droplet.sh
+
+>Creates a new VM, starts a docker container, and optionally add to the hardcoded load balancer
+>  * Params:   
+>    * 1: VM name 
+>    * 2: Docker container name - optional
+>    * 3: Docker image name - optional
+>    * -lb: Add to load balancer - optional
+
 ### create_vm.sh
 
 >Creates a new VM, starts a docker container, and adds to the hardcoded load balancer
@@ -20,6 +30,7 @@
 >    * 1: VM name 
 >    * 2: Docker container name
 >    * 3: Docker image name
+
     
 ### dns.sh
 

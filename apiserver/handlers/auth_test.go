@@ -6,6 +6,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"encoding/json"
 
@@ -200,7 +201,20 @@ func TestSessionsMineCase(t *testing.T) {
 }
 
 func TestUsersMeCase(t *testing.T) {
-	s := SessionState{}
+	u := users.User{
+		ID:        "test",
+		Email:     "gh@hopper.com",
+		UserName:  "GH",
+		FirstName: "Grace",
+		LastName:  "Hopper",
+		PhotoURL:  "test.com/pic",
+	}
+
+	s := SessionState{
+		BeginAt:    time.Now(),
+		ClientAddr: "test",
+		User:       &u,
+	}
 	rr := httptest.NewRecorder()
 	sid, err := sessions.BeginSession(c.SessionKey, c.SessionStore, &s, rr)
 	handler := http.HandlerFunc(c.UsersMeHandler)
@@ -222,9 +236,12 @@ func TestUsersMeCase(t *testing.T) {
 		t.Errorf("handler returned wrong status code: expected `%d` but got `%d`\n", http.StatusOK, rr.Code)
 	}
 
-	u := users.User{}
-	json.NewDecoder(rr.Body).Decode(&u)
-	if u.Email != nu.Email {
-		t.Errorf("returned user does not match: expected %s; got %s", nu.UserName, u.UserName)
+	ru := users.User{}
+	err = json.NewDecoder(rr.Body).Decode(&ru)
+	if err != nil {
+		t.Errorf("error decoding repsonse: %s", err.Error())
+	}
+	if ru.UserName != nu.UserName {
+		t.Errorf("returned user does not match: expected %s; got %s", ru.UserName, u.UserName)
 	}
 }

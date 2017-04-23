@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"net/http"
-	"os/user"
+	"time"
 
 	"encoding/json"
 
@@ -103,7 +103,11 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
-	s := &SessionState{}
+	s := &SessionState{
+		BeginAt:    time.Now(),
+		ClientAddr: r.RemoteAddr,
+		User:       u,
+	}
 	sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, s, w)
 
 	respond(w, u)
@@ -127,12 +131,12 @@ func (ctx *Context) SessionsMineHandler(w http.ResponseWriter, r *http.Request) 
 
 // UsersMeHandler responds with the session state
 func (ctx *Context) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
-	u := user.User{}
+	u := users.User{}
 	s := SessionState{
 		User: &u,
 	}
-	_, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
-	if err != nil {
+	sid, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
+	if err != nil || sid.String() == "" {
 		http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
 		return
 	}

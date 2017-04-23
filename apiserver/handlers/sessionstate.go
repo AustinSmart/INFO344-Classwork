@@ -1,13 +1,14 @@
 package handlers
 
 import (
-	"os/user"
 	"time"
+
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
 )
 
 // SessionState is used to track session state
 type SessionState struct {
 	BeginAt    time.Time
 	ClientAddr string
-	User       *user.User
+	User       *users.User
 }

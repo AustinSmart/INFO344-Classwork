@@ -52,10 +52,10 @@ func CORS(origins, methods, allowHeaders, exposeHeaders string) Adapter {
 			// - Access-Control-Allow-Methods: value of methods param
 			// - Access-Control-Allow-Headers: value of allowHeaders param
 			// - Access-Control-Expose-Headers: value of exposeHeaders param
-			w.Header().Add("Access-Control-Allow-Origin", origins)
-			w.Header().Add("Access-Control-Allow-Methods", methods)
-			w.Header().Add("Access-Control-Allow-Headers", allowHeaders)
-			w.Header().Add("Access-Control-Expose-Headers", exposeHeaders)
+			w.Header().Add(headerAccessControlAllowOrigin, origins)
+			w.Header().Add(headerAccessControlAllowMethods, methods)
+			w.Header().Add(headerAccessControlAllowHeaders, allowHeaders)
+			w.Header().Add(headerAccessControlExposeHeaders, exposeHeaders)
 
 			//if the request method is OPTIONS, this is a pre-flight
 			//CORS request to see if the real request should be allowed

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"net/http"
+	"os/user"
 
 	"encoding/json"
 
@@ -22,39 +23,40 @@ const (
 func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case "POST":
-		err := r.ParseForm()
+		nu := &users.NewUser{}
+		d := json.NewDecoder(r.Body)
+		err := d.Decode(nu)
 		if err != nil {
-			http.Error(w, "Bad Request", http.StatusBadRequest)
-			return
-		}
-		nu := users.NewUser{
-			Email:        r.FormValue("email"),
-			Password:     r.FormValue("password"),
-			PasswordConf: r.FormValue("passwordconf"),
-			UserName:     r.FormValue("username"),
-			FirstName:    r.FormValue("firstname"),
-			LastName:     r.FormValue("lastname"),
+			http.Error(w, "Bad JSON:"+err.Error(), http.StatusBadRequest)
 		}
 
 		err = nu.Validate()
 		if err != nil {
-			http.Error(w, "Bad Request", http.StatusBadRequest)
+			http.Error(w, "Error validating form: "+err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		u, _ := ctx.UserStore.GetByEmail(nu.Email)
+		u, err := ctx.UserStore.GetByEmail(nu.Email)
+		if err != nil && err != users.ErrUserNotFound {
+			http.Error(w, "Error validaitng form: "+err.Error(), http.StatusBadRequest)
+			return
+		}
 		if u != nil {
 			http.Error(w, "Email already exists", http.StatusBadRequest)
 			return
 		}
 
-		u, _ = ctx.UserStore.GetByUserName(nu.UserName)
+		u, err = ctx.UserStore.GetByUserName(nu.UserName)
+		if err != nil && err != users.ErrUserNotFound {
+			http.Error(w, "Error validaitng form: "+err.Error(), http.StatusBadRequest)
+			return
+		}
 		if u != nil {
 			http.Error(w, "Username already exists", http.StatusBadRequest)
 			return
 		}
 
-		u, err1 := ctx.UserStore.Insert(&nu)
+		u, err1 := ctx.UserStore.Insert(nu)
 		if err1 != nil {
 			http.Error(w, "Error saving user", http.StatusInternalServerError)
 			return
@@ -62,14 +64,14 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 		s := &SessionState{}
 		_, err1 = sessions.BeginSession(ctx.SessionKey, ctx.SessionStore, s, w)
 		if err1 != nil {
-			http.Error(w, "Session error", http.StatusInternalServerError)
+			http.Error(w, "Session error: "+err1.Error(), http.StatusInternalServerError)
 			return
 		}
 		respond(w, u)
 	case "GET":
 		u, err := ctx.UserStore.GetAll()
 		if err != nil {
-			http.Error(w, "Error retrieving users", http.StatusInternalServerError)
+			http.Error(w, "Error retrieving users: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
 		respond(w, u)
@@ -83,9 +85,11 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	c := users.Credentials{
-		Email:    r.FormValue("email"),
-		Password: r.FormValue("password"),
+	c := &users.Credentials{}
+	d := json.NewDecoder(r.Body)
+	err := d.Decode(c)
+	if err != nil {
+		http.Error(w, "Bad JSON:"+err.Error(), http.StatusBadRequest)
 	}
 
 	u, err := ctx.UserStore.GetByEmail(c.Email)
@@ -123,13 +127,16 @@ func (ctx *Context) SessionsMineHandler(w http.ResponseWriter, r *http.Request) 
 
 // UsersMeHandler responds with the session state
 func (ctx *Context) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
-	s := &SessionState{}
-	_, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, s)
+	u := user.User{}
+	s := SessionState{
+		User: &u,
+	}
+	_, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
 	if err != nil {
-		http.Error(w, "Error retrieving state", http.StatusInternalServerError)
+		http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
 		return
 	}
-	respond(w, s.User)
+	respond(w, u)
 }
 
 func respond(w http.ResponseWriter, data interface{}) {

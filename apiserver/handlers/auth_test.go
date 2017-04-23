@@ -4,14 +4,10 @@ import (
 	"bytes"
 	"net/http"
 	"net/http/httptest"
-	"net/url"
-	"strconv"
 	"strings"
 	"testing"
 
 	"encoding/json"
-
-	"fmt"
 
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/sessions"
@@ -43,17 +39,12 @@ func TestUsersCase(t *testing.T) {
 	handler := http.HandlerFunc(c.UsersHandler)
 	rr := httptest.NewRecorder()
 
-	form := url.Values{}
-	form.Add("email", nu.Email)
-	form.Add("password", nu.Password)
-	form.Add("passwordconf", nu.PasswordConf)
-	form.Add("username", nu.UserName)
-	form.Add("firstname", nu.FirstName)
-	form.Add("lastname", nu.LastName)
+	m, err := json.Marshal(&nu)
+	if err != nil {
+		t.Errorf("error encoding new user")
+	}
+	req, err := http.NewRequest("POST", "/v1/users", bytes.NewBuffer(m))
 
-	req, err := http.NewRequest("POST", "/v1/users", bytes.NewBufferString(form.Encode()))
-	req.Header.Add(headerContentType, "application/x-www-form-urlencoded")
-	req.Header.Add("Content-Length", strconv.Itoa(len(form.Encode())))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -137,13 +128,13 @@ func TestSessionsCase(t *testing.T) {
 
 	// Test correct request type
 	rr = httptest.NewRecorder()
-	form := url.Values{}
-	form.Add("email", nu.Email)
-	form.Add("password", nu.Password)
+	m, err := json.Marshal(&nu)
 
-	req, err = http.NewRequest("POST", "/v1/sessions", bytes.NewBufferString(form.Encode()))
-	req.Header.Add(headerContentType, "application/x-www-form-urlencoded")
-	req.Header.Add("Content-Length", strconv.Itoa(len(form.Encode())))
+	if err != nil {
+		t.Errorf("error encoding new user")
+	}
+	req, err = http.NewRequest("POST", "/v1/sessions", bytes.NewBuffer(m))
+
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -233,7 +224,6 @@ func TestUsersMeCase(t *testing.T) {
 
 	u := users.User{}
 	json.NewDecoder(rr.Body).Decode(&u)
-	fmt.Println(rr.Body)
 	if u.Email != nu.Email {
 		t.Errorf("returned user does not match: expected %s; got %s", nu.UserName, u.UserName)
 	}

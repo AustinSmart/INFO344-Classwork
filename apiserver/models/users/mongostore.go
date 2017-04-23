@@ -12,6 +12,15 @@ type MongoStore struct {
 	CollectionName string
 }
 
+// NewMongoStore returns a new MongoStore
+func NewMongoStore(session *mgo.Session, dbName string, collectionName string) *MongoStore {
+	return &MongoStore{
+		Session:        session,
+		DatabaseName:   dbName,
+		CollectionName: collectionName,
+	}
+}
+
 // GetAll returns all users
 func (ms *MongoStore) GetAll() ([]*User, error) {
 	users := []*User{}
@@ -26,6 +35,9 @@ func (ms *MongoStore) GetAll() ([]*User, error) {
 func (ms *MongoStore) GetByID(id UserID) (*User, error) {
 	u := &User{}
 	err := ms.Session.DB(ms.DatabaseName).C(ms.CollectionName).FindId(id).One(u)
+	if err == mgo.ErrNotFound {
+		return nil, ErrUserNotFound
+	}
 	return u, err
 }
 
@@ -33,6 +45,9 @@ func (ms *MongoStore) GetByID(id UserID) (*User, error) {
 func (ms *MongoStore) GetByEmail(email string) (*User, error) {
 	u := &User{}
 	err := ms.Session.DB(ms.DatabaseName).C(ms.CollectionName).Find(bson.M{"email": email}).One(u)
+	if err == mgo.ErrNotFound {
+		return nil, ErrUserNotFound
+	}
 	return u, err
 }
 
@@ -40,6 +55,9 @@ func (ms *MongoStore) GetByEmail(email string) (*User, error) {
 func (ms *MongoStore) GetByUserName(name string) (*User, error) {
 	u := &User{}
 	err := ms.Session.DB(ms.DatabaseName).C(ms.CollectionName).Find(bson.M{"username": name}).One(u)
+	if err == mgo.ErrNotFound {
+		return nil, ErrUserNotFound
+	}
 	return u, err
 }
 

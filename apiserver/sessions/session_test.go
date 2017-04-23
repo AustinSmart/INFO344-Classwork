@@ -1,11 +1,9 @@
 package sessions
 
-import (
-	"net/http"
-	"net/http/httptest"
-	"strings"
-	"testing"
-)
+import "testing"
+import "net/http/httptest"
+import "strings"
+import "net/http"
 
 func TestSessionCycle(t *testing.T) {
 	state := struct {

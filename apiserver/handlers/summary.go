@@ -99,7 +99,9 @@ func SummaryHandler(w http.ResponseWriter, r *http.Request) {
 	//   Access-Control-Allow-Origin: *
 	//this will allow JavaScript served from other origins
 	//to call this API
-	w.Header().Add("Access-Control-Allow-Origin", "*")
+
+	//Removed due to being included in mux, middleware now adds this header
+	//w.Header().Add("Access-Control-Allow-Origin", "*")
 
 	//get the `url` query string parameter
 	//if you use r.FormValue() it will also handle cases where

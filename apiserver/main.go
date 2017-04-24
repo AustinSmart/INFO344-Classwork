@@ -16,9 +16,13 @@ import (
 )
 
 const (
-	apiRoot     = "/v1/"
-	apiSummary  = apiRoot + "summary"
-	defaultPort = "443"
+	apiRoot         = "/v1/"
+	apiSummary      = apiRoot + "summary"
+	apiUsers        = apiRoot + "users"
+	apiSessions     = apiRoot + "sessions"
+	apiSessionsMine = apiSessions + "/mine"
+	apiUsersMe      = apiUsers + "/me"
+	defaultPort     = "443"
 )
 
 func main() {
@@ -55,14 +59,15 @@ func main() {
 	}
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v1/users", ctx.UsersHandler)
-	mux.HandleFunc("/v1/sessions", ctx.SessionsHandler)
-	mux.HandleFunc("/v1/sessions/mine", ctx.SessionsMineHandler)
-	mux.HandleFunc("/v1/users/me", ctx.UsersMeHandler)
+	mux.HandleFunc(apiUsers, ctx.UsersHandler)
+	mux.HandleFunc(apiSessions, ctx.SessionsHandler)
+	mux.HandleFunc(apiSessionsMine, ctx.SessionsMineHandler)
+	mux.HandleFunc(apiUsersMe, ctx.UsersMeHandler)
 	mux.HandleFunc(apiSummary, handlers.SummaryHandler)
+
 	http.Handle(apiRoot, middleware.Adapt(mux, middleware.CORS("", "", "", "")))
 
 	//start the server
 	fmt.Printf("listening on %s...\n", addr)
-	log.Fatal(http.ListenAndServeTLS(addr, tlsCertPath, tlsKeyPath, mux))
+	log.Fatal(http.ListenAndServeTLS(addr, tlsCertPath, tlsKeyPath, nil))
 }

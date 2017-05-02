@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <title>Taut</title>
+        <link rel="icon" href="img/favicon.ico">
+
+        <!--Material Design Lite -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue_grey-orange.min.css" />
+        
+        <link rel="stylesheet" href="css/main.css">
+
+        <script defer src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+        <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+        <script defer src="js/common.js"></script>
+         <script defer src="js/profile.js"></script>
+    </head>
+        <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner" id="spinner"></div>
+    <body>
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer
+                mdl-layout--fixed-header">
+            <header class="mdl-layout__header" id="header">
+                <div class="mdl-layout__header-row">
+                    <div>
+                        <h2>User Profile</h2>
+                    </div>
+                    <div class="mdl-layout-spacer"></div>
+                    <nav class="mdl-navigation">
+                        <button class="mdl-layout--large-screen-only mdl-button mdl-js-button 
+                        mdl-button--raised mdl-button--accent mdl-js-ripple-effect" id="sign-out-button-large">Sign Out</button>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer mdl-color--orange-300">
+                <span class="mdl-layout-title">Taut</span>
+                <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="#" id="general-link">#general</a>
+                <a class="mdl-navigation__link" href="#" id="random-link">#random</a>
+                <nav class="mdl-navigation">
+                        <button class="mdl-layout--small-screen-only mdl-button mdl-js-button 
+                        mdl-button--raised mdl-button--colored mdl-js-ripple-effect" id="sign-out-button-small">Sign Out</button>
+                </nav>
+            </div>
+            <main class="mdl-layout__content">
+                <div id="page-content">
+                    <div class="mdl-card__supporting-text">
+                        <div class="">
+                            <h1 id="user"></h1>
+                        </div>
+				        <form id="update-form">
+                            <h6> Update your first and last name </h6>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label" id="display-name-field">
+                                <input class="mdl-textfield__input" type="text" id="display-name-input" readonly/>
+                                <label class="mdl-textfield__label" for="display-name-input">Username</label>
+                            </div>
+                           <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="email" id="email-input" readonly/>
+                                <label class="mdl-textfield__label" for="email-input">Email</label>
+                            </div> 
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="text" id="first-name-input"/>
+                                <label class="mdl-textfield__label" for="first-name-input">First Name</label>
+                            </div>
+                            <div class="mdl-textfield mdl-js-textfield mdl-textfield--floating-label">
+                                <input class="mdl-textfield__input" type="text" id="last-name-input"/>
+                                <label class="mdl-textfield__label" for="last-name-input">Last Name</label>
+                            </div>
+                            <div class="mdl-card--border">
+                                <button class="mdl-button mdl-js-button mdl-button--raised mdl-button--colored mdl-js-ripple-effect">Save</button>
+                            </div>    
+                        </form>
+		            </div>
+                </div>
+            </main>
+        </div>
+    </body>
+</html>

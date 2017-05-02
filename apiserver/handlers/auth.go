@@ -21,6 +21,7 @@ const (
 
 // UsersHandler adds and returns a new user if the request type is POST, returns all users if the request type is GET
 func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	switch r.Method {
 	case "POST":
 		nu := &users.NewUser{}
@@ -80,6 +81,7 @@ func (ctx *Context) UsersHandler(w http.ResponseWriter, r *http.Request) {
 
 // SessionsHandler allows existing users to sign in
 func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	if r.Method != "POST" {
 		http.Error(w, "Request type must be POST", http.StatusBadRequest)
 		return
@@ -115,6 +117,7 @@ func (ctx *Context) SessionsHandler(w http.ResponseWriter, r *http.Request) {
 
 // SessionsMineHandler allows authenticated users to sign out
 func (ctx *Context) SessionsMineHandler(w http.ResponseWriter, r *http.Request) {
+	defer r.Body.Close()
 	if r.Method != "DELETE" {
 		http.Error(w, "Request type must be DELETE", http.StatusBadRequest)
 		return
@@ -131,16 +134,43 @@ func (ctx *Context) SessionsMineHandler(w http.ResponseWriter, r *http.Request) 
 
 // UsersMeHandler responds with the session state
 func (ctx *Context) UsersMeHandler(w http.ResponseWriter, r *http.Request) {
-	u := users.User{}
-	s := SessionState{
-		User: &u,
+	defer r.Body.Close()
+	switch r.Method {
+	case "GET":
+
+		u := users.User{}
+		s := SessionState{
+			User: &u,
+		}
+		sid, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
+		if err != nil || sid.String() == "" {
+			http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		respond(w, u)
+
+	case "PATCH":
+		u := users.User{}
+		s := SessionState{
+			User: &u,
+		}
+		sid, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
+		if err != nil || sid.String() == "" {
+			http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		uu := &users.UserUpdates{}
+		d := json.NewDecoder(r.Body)
+		err = d.Decode(uu)
+		if err != nil {
+			http.Error(w, "Bad JSON:"+err.Error(), http.StatusBadRequest)
+		}
+		err = ctx.UserStore.Update(uu, &u)
+		if err != nil {
+			http.Error(w, "Error updating user:"+err.Error(), http.StatusInternalServerError)
+		}
+		respond(w, u)
 	}
-	sid, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
-	if err != nil || sid.String() == "" {
-		http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
-		return
-	}
-	respond(w, u)
 }
 
 func respond(w http.ResponseWriter, data interface{}) {
@@ -148,3 +178,26 @@ func respond(w http.ResponseWriter, data interface{}) {
 	encoder := json.NewEncoder(w)
 	encoder.Encode(data)
 }
+
+// case "PATCH":
+// 		u := users.User{}
+// 		s := SessionState{
+// 			User: &u,
+// 		}
+// 		sid, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
+// 		if err != nil || sid.String() == "" {
+// 			http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
+// 			return
+// 		}
+// 		uu := &users.UserUpdates{}
+// 		d := json.NewDecoder(r.Body)
+// 		err = d.Decode(uu)
+// 		if err != nil {
+// 			http.Error(w, "Bad JSON:"+err.Error(), http.StatusBadRequest)
+// 		}
+// 		// err = ctx.UserStore.Update(uu, &u)
+// 		// if err != nil {
+// 		// 	http.Error(w, "Error updating user:"+err.Error(), http.StatusInternalServerError)
+// 		// }
+// 		respond(w, u)
+// 	}

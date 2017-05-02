@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <title>Taut</title>
+        <link rel="icon" href="img/favicon.ico">
+
+        <!--Material Design Lite -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+        <link rel="stylesheet" href="https://code.getmdl.io/1.2.1/material.blue_grey-orange.min.css" />
+        
+        <link rel="stylesheet" href="css/main.css">
+
+        <script defer src="https://www.gstatic.com/firebasejs/3.5.2/firebase.js"></script>
+        <script defer src="https://code.getmdl.io/1.2.1/material.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.14.1/moment-with-locales.min.js"></script>
+        <script defer src="js/common.js"></script>
+        <script defer src="js/messages.js"></script>
+    </head>
+    <div class="mdl-spinner mdl-spinner--single-color mdl-js-spinner is-active" id="spinner"></div>
+    <body>
+        <div class="mdl-layout mdl-js-layout mdl-layout--fixed-drawer
+                mdl-layout--fixed-header" id="page">
+            <header class="mdl-layout__header" id="header">
+                <div class="mdl-layout__header-row">
+                    <div>
+                        <h2 id="current-channel"></h2>
+                    </div>
+                    <div class="mdl-layout-spacer"></div>
+                    <nav class="mdl-navigation">
+                        <button class="mdl-layout--large-screen-only mdl-button mdl-js-button 
+                        mdl-button--raised mdl-button--accent mdl-js-ripple-effect" id="sign-out-button-large">Sign Out</button>
+                    </nav>
+                </div>
+            </header>
+            <div class="mdl-layout__drawer mdl-color--orange-300">
+                <span class="mdl-layout-title">Taut</span>
+                <nav class="mdl-navigation">
+                <a class="mdl-navigation__link" href="profile.html" id="user-profile-link"></a>
+                <a class="mdl-navigation__link" href="#" id="general-link">#general</a>
+                <a class="mdl-navigation__link" href="#" id="random-link">#random</a>
+                <nav class="mdl-navigation">
+                        <button class="mdl-layout--small-screen-only mdl-button mdl-js-button 
+                        mdl-button--raised mdl-button--colored mdl-js-ripple-effect" id="sign-out-button-small">Sign Out</button>
+                </nav>
+            </div>
+            <main class="mdl-layout__content">
+                <div id="page-content">
+                    <ul class="list-three mdl-list" id="messages-content">
+                    </ul>
+                </div>
+            </main>
+            <footer class="mdl-mini-footer mdl-color--grey-300" id="footer">
+                <div class="mdl-layout--large-screen-only"id="messages-input-field-large">
+                    <form action="#" id="message-input-form-large">
+                            <div class="mdl-textfield mdl-js-textfield wide-textfield">
+                                <input class="mdl-textfield__input" type="text" id="message-input-field-large">
+                                <label class="mdl-textfield__label" for="message-input-field-large">Enter a message</label>
+                            </div>
+                    </form>
+                </div>
+                <div class="mdl-layout--small-screen-only "id="messages-input-field-small">
+                    <form action="#" id="message-input-form-small">
+                            <div class="mdl-textfield mdl-js-textfield skinny-textfield">
+                                <input class="mdl-textfield__input" type="text" id="message-input-field-small">
+                                <label class="mdl-textfield__label" for="message-input-field-small">Enter a message</label>
+                            </div>
+                    </form>
+                </div>
+            </footer>
+        </div>
+    </body>
+</html>

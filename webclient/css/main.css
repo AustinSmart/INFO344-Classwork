@@ -1,0 +1,81 @@
+body, input, button {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+}
+a {
+    text-decoration: none;
+}
+input {
+    width: 100%;
+    padding: 0.5rem;
+}
+form > div {
+    margin-bottom: 1rem;
+}
+.container {
+    max-width: 1170px;
+    margin: 0 auto;
+    padding: 15px;
+}
+button {
+    padding: 0.5rem;
+}
+.centered {
+    align-items: center;
+    justify-content: center;
+}
+.mdl-layout__content {
+	padding: 24px;
+}
+.mdl-layout-title {
+    font-size: 5em;
+    padding-top: 20px;
+}
+.mdl-navigation__link {
+    text-decoration: none;
+    font-size: 1.5em;
+}
+.mdl-list__item:hover {
+    background: #607d8b;
+    border-radius: 4px;
+}
+.material-icons {
+    color: #e0e0e0;
+}
+.wide-textfield {
+    width: 500px;
+}
+.skinny-textfield {
+    width: 250px;
+}
+.hidden {
+    display: none;
+}
+.time {
+    font-size:.8em; 
+    color: #999;
+}
+#sign-out-button {
+    float: right;
+}
+#messages-input-field-large {
+    padding-left: 250px;
+}
+#messages-input-field-small {
+    padding-left: 10%;
+}
+#page {
+    display: none;
+}
+#spinner { /* Modified from this CodePen: https://codepen.io/MattIn4D/pen/LiKFC */
+    position: fixed;
+    z-index: 999;
+    height: 2em;
+    width: 2em;
+    overflow: show;
+    margin: auto;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+}

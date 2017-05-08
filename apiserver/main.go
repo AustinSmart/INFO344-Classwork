@@ -49,6 +49,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("error dialing mongo: %v", err)
 	}
+	defer mongoSession.Close()
 
 	mongoStore := users.NewMongoStore(mongoSession, "users-db", "users")
 

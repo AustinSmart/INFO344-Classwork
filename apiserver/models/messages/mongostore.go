@@ -37,7 +37,8 @@ func (ms *MongoStore) GetAllChannels() ([]*Channel, error) {
 //GetMessages returns `n` number of messages from a channel
 func (ms *MongoStore) GetMessages(n int, channel ChannelID) ([]*Message, error) {
 	messages := []*Message{}
-	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Find(bson.M{"channelID": channel}).Limit(n).All(&messages)
+	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Find(bson.M{"channelid": channel}).Limit(n).All(&messages)
+	//TODO implement limit
 	if err != nil {
 		return nil, err
 	}
@@ -49,8 +50,8 @@ func (ms *MongoStore) InsertChannel(user users.UserID, newChannel *NewChannel) (
 	channel := newChannel.ToChannel()
 	channel.ID = ChannelID(bson.NewObjectId().Hex())
 	channel.CreatorID = user
-	//TODO insert to db
-	return channel, nil
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Insert(channel)
+	return channel, err
 }
 
 //InsertMessage creates a new message
@@ -58,36 +59,57 @@ func (ms *MongoStore) InsertMessage(user users.UserID, newMessage *NewMessage) (
 	message := newMessage.ToMessage()
 	message.ID = MessageID(bson.NewObjectId().Hex())
 	message.CreatorID = user
-	//TODO insert to db
-	return message, nil
+	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Insert(message)
+	return message, err
 }
 
-//InsertUser adds a user to a channels members list
-func (ms *MongoStore) InsertUser(user *users.UserID, channel ChannelID) (*Channel, error) {
-	return nil, nil
+//AddUser adds a user to a channels members list
+func (ms *MongoStore) AddUser(user *users.UserID, channel ChannelID) error {
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$push": bson.M{"members": user}})
+	return err
 }
 
 //UpdateChannel updates a channels name and description
-func (ms *MongoStore) UpdateChannel(updates *ChannelUpdates, channel ChannelID) (*Channel, error) {
-	return nil, nil
+func (ms *MongoStore) UpdateChannel(updates *ChannelUpdates, channel ChannelID) error {
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$set": bson.M{"name": updates.Name, "description": updates.Description}})
+	if err == mgo.ErrNotFound {
+		return ErrChannelNotFound
+	}
+	return err
 }
 
 //UpdateMessage updates a messages body
-func (ms *MongoStore) UpdateMessage(updates *MessageUpdates, message MessageID) (*Message, error) {
-	return nil, nil
+func (ms *MongoStore) UpdateMessage(updates *MessageUpdates, message MessageID) error {
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": message}, bson.M{"$set": bson.M{"body": updates.Body}})
+	if err == mgo.ErrNotFound {
+		return ErrMessageNotFound
+	}
+	return err
 }
 
 //DeleteChannel removes a channel and all messages within it
 func (ms *MongoStore) DeleteChannel(channel ChannelID) error {
-	return nil
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Remove(bson.M{"_id": channel})
+	if err == mgo.ErrNotFound {
+		return ErrChannelNotFound
+	}
+	return err
 }
 
 //DeleteMessage removes a message
 func (ms *MongoStore) DeleteMessage(message MessageID) error {
-	return nil
+	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Remove(bson.M{"_id": message})
+	if err == mgo.ErrNotFound {
+		return ErrMessageNotFound
+	}
+	return err
 }
 
 //RemoveUser removes a user from a channels member list
 func (ms *MongoStore) RemoveUser(user *users.UserID, channel ChannelID) error {
-	return nil
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$pull": bson.M{"members": user}})
+	if err == mgo.ErrNotFound {
+		return users.ErrUserNotFound
+	}
+	return err
 }

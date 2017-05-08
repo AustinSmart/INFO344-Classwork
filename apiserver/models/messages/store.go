@@ -26,14 +26,14 @@ type Store interface {
 	//InsertMessage creates a new message
 	InsertMessage(user users.UserID, newMessage *NewMessage) *Message
 
-	//InsertUser adds a user to a channels members list
-	InsertUser(user *users.UserID, channel ChannelID) (*Channel, error)
+	//AddUser adds a user to a channels members list
+	AddUser(user *users.UserID, channel ChannelID) error
 
 	//UpdateChannel updates a channels name and description
-	UpdateChannel(updates *ChannelUpdates, channel ChannelID) (*Channel, error)
+	UpdateChannel(updates *ChannelUpdates, channel ChannelID) error
 
 	//UpdateMessage updates a messages body
-	UpdateMessage(updates *MessageUpdates, message MessageID) (*Message, error)
+	UpdateMessage(updates *MessageUpdates, message MessageID) error
 
 	//DeleteChannel removes a channel and all messages within it
 	DeleteChannel(channel ChannelID) error

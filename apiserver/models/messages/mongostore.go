@@ -69,6 +69,15 @@ func (ms *MongoStore) AddUser(user *users.UserID, channel ChannelID) error {
 	return err
 }
 
+//RemoveUser removes a user from a channels member list
+func (ms *MongoStore) RemoveUser(user *users.UserID, channel ChannelID) error {
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$pull": bson.M{"members": user}})
+	if err == mgo.ErrNotFound {
+		return users.ErrUserNotFound
+	}
+	return err
+}
+
 //UpdateChannel updates a channels name and description
 func (ms *MongoStore) UpdateChannel(updates *ChannelUpdates, channel ChannelID) error {
 	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$set": bson.M{"name": updates.Name, "description": updates.Description}})
@@ -80,7 +89,7 @@ func (ms *MongoStore) UpdateChannel(updates *ChannelUpdates, channel ChannelID) 
 
 //UpdateMessage updates a messages body
 func (ms *MongoStore) UpdateMessage(updates *MessageUpdates, message MessageID) error {
-	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": message}, bson.M{"$set": bson.M{"body": updates.Body}})
+	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Update(bson.M{"_id": message}, bson.M{"$set": bson.M{"body": updates.Body}})
 	if err == mgo.ErrNotFound {
 		return ErrMessageNotFound
 	}
@@ -101,15 +110,6 @@ func (ms *MongoStore) DeleteMessage(message MessageID) error {
 	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Remove(bson.M{"_id": message})
 	if err == mgo.ErrNotFound {
 		return ErrMessageNotFound
-	}
-	return err
-}
-
-//RemoveUser removes a user from a channels member list
-func (ms *MongoStore) RemoveUser(user *users.UserID, channel ChannelID) error {
-	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$pull": bson.M{"members": user}})
-	if err == mgo.ErrNotFound {
-		return users.ErrUserNotFound
 	}
 	return err
 }

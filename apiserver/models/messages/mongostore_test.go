@@ -78,6 +78,78 @@ func TestCRUD(t *testing.T) {
 		t.Fatalf("getMessage failed. expected: %d. recieved: %d\n", 2, len(allM))
 	}
 
+	uID = append(uID, "4444")
+	err = s.AddUser(&uID[3], c.ID)
+	if err != nil {
+		t.Errorf("error adding user: %v\n", err)
+	}
+	allC, err = s.GetAllChannels()
+	if allC[0].Members[3] == "" || allC[0].Members[3] != uID[3] {
+		t.Fatalf("AddUser failed. expected: %s. recieved: %s\n", uID[3], allC[0].Members[3])
+	}
+
+	err = s.RemoveUser(&uID[3], c.ID)
+	if err != nil {
+		t.Errorf("error removing user: %v\n", err)
+	}
+	allC, err = s.GetAllChannels()
+	if len(allC[0].Members) > 3 {
+		if allC[0].Members[3] != "" || allC[0].Members[3] == uID[3] {
+			t.Fatalf("AddUser failed. expected: %s. recieved: %s\n", "nothing", allC[0].Members[3])
+		}
+	}
+
+	cup := ChannelUpdates{
+		Name:        "Test Channel UPDATED",
+		Description: "This is only a test UPDATED",
+	}
+
+	err = s.UpdateChannel(&cup, c.ID)
+	if err != nil {
+		t.Errorf("error udating channel: %v\n", err)
+	}
+	allC, err = s.GetAllChannels()
+	if allC[0].Name != cup.Name {
+		t.Fatalf("UpdateChannel name failed. expected: %s. recieved: %s\n", cup.Name, allC[0].Name)
+	}
+	if allC[0].Description != cup.Description {
+		t.Fatalf("UpdateChannel description failed. expected: %s. recieved: %s\n", cup.Description, allC[0].Description)
+	}
+
+	mup := MessageUpdates{
+		Body: "This is a test message UPDATED",
+	}
+
+	err = s.UpdateMessage(&mup, allM[0].ID)
+	if err != nil {
+		t.Errorf("error udating message: %v\n", err)
+	}
+	allM, err = s.GetMessages(500, c.ID)
+	if allM[0].Body != mup.Body {
+		t.Fatalf("Update message failed. expected: %s. recieved: %s\n", mup.Body, allM[0].Body)
+	}
+
+	err = s.DeleteMessage(allM[1].ID)
+	if err != nil {
+		t.Errorf("error deleting message: %v\n", err)
+	}
+	allM, err = s.GetMessages(500, c.ID)
+	if len(allM) > 1 {
+		t.Fatalf("Update message failed. expected: %d. recieved: %d\n", 1, len(allM))
+	}
+
+	err = s.DeleteChannel(c.ID)
+	if err != nil {
+		t.Errorf("error deleting channel: %v\n", err)
+	}
+	allC, err = s.GetAllChannels()
+	if err != nil {
+		t.Errorf("error getting all channels: %v\n", err)
+	}
+	if len(allC) != 0 {
+		t.Fatalf("expected: %d channels, recieved: %d\n", 0, len(allC))
+	}
+
 	sess.DB(s.DatabaseName).C(s.ChannelsCollectionName).RemoveAll(nil)
 	sess.DB(s.DatabaseName).C(s.MessagesCollectionName).RemoveAll(nil)
 }

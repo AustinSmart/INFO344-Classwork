@@ -29,6 +29,9 @@ type Store interface {
 	//AddUser adds a user to a channels members list
 	AddUser(user *users.UserID, channel ChannelID) error
 
+	//RemoveUser removes a user from a channels member list
+	RemoveUser(user *users.UserID, channel ChannelID) error
+
 	//UpdateChannel updates a channels name and description
 	UpdateChannel(updates *ChannelUpdates, channel ChannelID) error
 
@@ -40,7 +43,4 @@ type Store interface {
 
 	//DeleteMessage removes a message
 	DeleteMessage(message MessageID) error
-
-	//RemoveUser removes a user from a channels member list
-	RemoveUser(user *users.UserID, channel ChannelID) error
 }

@@ -18,13 +18,13 @@ type Store interface {
 	GetAllChannels() ([]*Channel, error)
 
 	//GetMessages returns `n` number of messages from a channel
-	GetMessages(n int, channel ChannelID) (*[]Message, error)
+	GetMessages(n int, channel ChannelID) ([]*Message, error)
 
 	//InsertChannel creates a new channel
-	InsertChannel(newChannel *NewChannel) (*Channel, error)
+	InsertChannel(user users.UserID, newChannel *NewChannel) *Channel
 
 	//InsertMessage creates a new message
-	InsertMessage(newMessage *NewMessage) (*Message, error)
+	InsertMessage(user users.UserID, newMessage *NewMessage) *Message
 
 	//InsertUser adds a user to a channels members list
 	InsertUser(user *users.UserID, channel ChannelID) (*Channel, error)

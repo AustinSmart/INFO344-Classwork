@@ -1,6 +1,10 @@
 package messages
 
-import "github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
+import (
+	"time"
+
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
+)
 
 //MessageID defines the type for message ID's
 type MessageID string
@@ -24,4 +28,14 @@ type NewMessage struct {
 //MessageUpdates represents the field a message creator can modify
 type MessageUpdates struct {
 	Body string `json:"body"`
+}
+
+//ToMessage converts a new message to a message
+func (nm *NewMessage) ToMessage() *Message {
+	m := Message{
+		ChannelID: nm.ChannelID,
+		Body:      nm.Body,
+		CreatedAt: time.Now().String(),
+	}
+	return &m
 }

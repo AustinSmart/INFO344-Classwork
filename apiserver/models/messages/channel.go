@@ -1,6 +1,10 @@
 package messages
 
-import "github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
+import (
+	"time"
+
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
+)
 
 //ChannelID defines the type for channel ID's
 type ChannelID string
@@ -24,8 +28,20 @@ type NewChannel struct {
 	Private     bool           `json:"private"`
 }
 
-// ChannelUpdates represents the fields a channel creator can modify
+//ChannelUpdates represents the fields a channel creator can modify
 type ChannelUpdates struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+}
+
+//ToChannel converts a newChannel to a channel
+func (nc *NewChannel) ToChannel() *Channel {
+	c := Channel{
+		Name:        nc.Name,
+		Description: nc.Description,
+		Members:     nc.Members,
+		Private:     nc.Private,
+		CreatedAt:   time.Now().String(),
+	}
+	return &c
 }

@@ -11,22 +11,31 @@ import (
 
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/handlers"
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/middleware"
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/messages"
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/sessions"
 )
 
 const (
-	apiRoot         = "/v1/"
-	apiSummary      = apiRoot + "summary"
+	apiRoot = "/v1/"
+
+	apiSummary = apiRoot + "summary"
+
 	apiUsers        = apiRoot + "users"
 	apiSessions     = apiRoot + "sessions"
 	apiSessionsMine = apiSessions + "/mine"
 	apiUsersMe      = apiUsers + "/me"
-	defaultPort     = "443"
+
+	apiChannels        = apiRoot + "channels"
+	apiSpecificChannel = apiChannels + "/"
+	apiMessages        = apiRoot + "messages"
+	apiSpecificMessage = apiMessages + "/"
+
+	defaultPort = "443"
 )
 
 func main() {
-	//environment variables
+	//Environment variables
 	port := os.Getenv("PORT")
 	if len(port) == 0 {
 		port = defaultPort
@@ -51,24 +60,38 @@ func main() {
 	}
 	defer mongoSession.Close()
 
-	mongoStore := users.NewMongoStore(mongoSession, "users-db", "users")
+	mongoUsersStore := users.NewMongoStore(mongoSession, "users-db", "users")
+	mongoMessagesStore := messages.NewMongoStore(mongoSession, "messages-db", "messages", "channels")
 
 	ctx := handlers.Context{
-		SessionKey:   sessionKey,
-		SessionStore: sessions.NewRedisStore(client, -1),
-		UserStore:    mongoStore,
+		SessionKey:    sessionKey,
+		SessionStore:  sessions.NewRedisStore(client, -1),
+		UserStore:     mongoUsersStore,
+		MessagesStore: mongoMessagesStore,
 	}
 
 	mux := http.NewServeMux()
+	mux.HandleFunc(apiSummary, handlers.SummaryHandler)
 	mux.HandleFunc(apiUsers, ctx.UsersHandler)
 	mux.HandleFunc(apiSessions, ctx.SessionsHandler)
 	mux.HandleFunc(apiSessionsMine, ctx.SessionsMineHandler)
 	mux.HandleFunc(apiUsersMe, ctx.UsersMeHandler)
-	mux.HandleFunc(apiSummary, handlers.SummaryHandler)
+	mux.HandleFunc(apiChannels, ctx.ChannelsHandler)
+	mux.HandleFunc(apiSpecificChannel, ctx.SpecificChannelHandler)
+	mux.HandleFunc(apiMessages, ctx.MessagesHandler)
+	mux.HandleFunc(apiSpecificMessage, ctx.SpecificMessageHandler)
 
 	http.Handle(apiRoot, middleware.Adapt(mux, middleware.CORS("", "", "", "")))
 
-	//start the server
+	//General channel for all users
+	nc := &messages.NewChannel{
+		Name:        "General",
+		Description: "A public channel for all users of Taut",
+		Private:     false,
+	}
+	ctx.MessagesStore.InsertChannel("admin", nc)
+
+	//Start the server
 	fmt.Printf("listening on %s...\n", addr)
 	log.Fatal(http.ListenAndServeTLS(addr, tlsCertPath, tlsKeyPath, nil))
 }

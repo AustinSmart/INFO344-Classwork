@@ -21,10 +21,10 @@ type Store interface {
 	GetMessages(n int, channel ChannelID) ([]*Message, error)
 
 	//InsertChannel creates a new channel
-	InsertChannel(user users.UserID, newChannel *NewChannel) *Channel
+	InsertChannel(user users.UserID, newChannel *NewChannel) (*Channel, error)
 
 	//InsertMessage creates a new message
-	InsertMessage(user users.UserID, newMessage *NewMessage) *Message
+	InsertMessage(user users.UserID, newMessage *NewMessage) (*Message, error)
 
 	//AddUser adds a user to a channels members list
 	AddUser(user *users.UserID, channel ChannelID) error

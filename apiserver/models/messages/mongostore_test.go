@@ -40,6 +40,14 @@ func TestCRUD(t *testing.T) {
 		t.Errorf("inserted channels members is incorrect. expected: %d, recieved: %d\n", len(uID), len(c.Members))
 	}
 
+	c, err = s.GetChannel(c.ID)
+	if err != nil {
+		t.Errorf("error getting channel: %v\n", err)
+	}
+	if nil == c {
+		t.Fatalf("nil returned from Store.GetChannel()")
+	}
+
 	allC, err := s.GetAllChannels(uID[0])
 	if err != nil {
 		t.Errorf("error getting all channels: %v\n", err)
@@ -75,7 +83,15 @@ func TestCRUD(t *testing.T) {
 		t.Errorf("error getting messages: %v\n", err)
 	}
 	if len(allM) != 2 {
-		t.Fatalf("getMessage failed. expected: %d. recieved: %d\n", 2, len(allM))
+		t.Fatalf("getMessages failed. expected: %d. recieved: %d\n", 2, len(allM))
+	}
+
+	tm, err := s.GetMessage(allM[0].ID)
+	if err != nil {
+		t.Errorf("error getting message: %v\n", err)
+	}
+	if tm.ID != allM[0].ID {
+		t.Fatalf("getMessage failed. expected: %s. recieved: %s\n", allM[0].ID, tm.ID)
 	}
 
 	uID = append(uID, "4444")

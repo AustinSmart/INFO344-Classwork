@@ -17,8 +17,14 @@ type Store interface {
 	//GetAllChannels returns all channels a user is allowed to see
 	GetAllChannels(user users.UserID) ([]*Channel, error)
 
+	//GetChannel returns the requested channel
+	GetChannel(channel ChannelID) (*Channel, error)
+
 	//GetMessages returns `n` number of messages from a channel
 	GetMessages(n int, channel ChannelID) ([]*Message, error)
+
+	//GetMessage returns the requested message
+	GetMessage(message MessageID) (*Message, error)
 
 	//InsertChannel creates a new channel
 	InsertChannel(user users.UserID, newChannel *NewChannel) (*Channel, error)

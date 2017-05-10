@@ -34,15 +34,34 @@ func (ms *MongoStore) GetAllChannels(user users.UserID) ([]*Channel, error) {
 	return channels, nil
 }
 
+//GetChannel returns the requested channel
+func (ms *MongoStore) GetChannel(channel ChannelID) (*Channel, error) {
+	c := Channel{}
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Find(bson.M{"_id": channel}).One(&c)
+	if err == mgo.ErrNotFound {
+		return nil, ErrChannelNotFound
+	}
+	return &c, err
+}
+
 //GetMessages returns `n` number of messages from a channel
 func (ms *MongoStore) GetMessages(n int, channel ChannelID) ([]*Message, error) {
 	messages := []*Message{}
 	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Find(bson.M{"channelid": channel}).Limit(n).All(&messages)
-	//TODO implement limit
 	if err != nil {
 		return nil, err
 	}
 	return messages, nil
+}
+
+//GetMessage returns the requested message
+func (ms *MongoStore) GetMessage(message MessageID) (*Message, error) {
+	m := Message{}
+	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Find(bson.M{"_id": message}).One(&m)
+	if err == mgo.ErrNotFound {
+		return nil, ErrMessageNotFound
+	}
+	return &m, err
 }
 
 //InsertChannel creates a new channel

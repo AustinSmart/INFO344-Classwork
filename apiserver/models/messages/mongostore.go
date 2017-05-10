@@ -1,6 +1,8 @@
 package messages
 
 import (
+	"time"
+
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -69,6 +71,7 @@ func (ms *MongoStore) InsertChannel(user users.UserID, newChannel *NewChannel) (
 	channel := newChannel.ToChannel()
 	channel.ID = ChannelID(bson.NewObjectId().Hex())
 	channel.CreatorID = user
+	channel.Members = append(channel.Members, user)
 	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Insert(channel)
 	return channel, err
 }
@@ -99,7 +102,7 @@ func (ms *MongoStore) RemoveUser(user *users.UserID, channel ChannelID) error {
 
 //UpdateChannel updates a channels name and description
 func (ms *MongoStore) UpdateChannel(updates *ChannelUpdates, channel ChannelID) error {
-	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$set": bson.M{"name": updates.Name, "description": updates.Description}})
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Update(bson.M{"_id": channel}, bson.M{"$set": bson.M{"name": updates.Name, "description": updates.Description, "editedat": time.Now().String()}})
 	if err == mgo.ErrNotFound {
 		return ErrChannelNotFound
 	}
@@ -108,7 +111,7 @@ func (ms *MongoStore) UpdateChannel(updates *ChannelUpdates, channel ChannelID) 
 
 //UpdateMessage updates a messages body
 func (ms *MongoStore) UpdateMessage(updates *MessageUpdates, message MessageID) error {
-	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Update(bson.M{"_id": message}, bson.M{"$set": bson.M{"body": updates.Body}})
+	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Update(bson.M{"_id": message}, bson.M{"$set": bson.M{"body": updates.Body, "editedat": time.Now().String()}})
 	if err == mgo.ErrNotFound {
 		return ErrMessageNotFound
 	}

@@ -127,7 +127,7 @@ func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 	case "LINK":
-		uu := r.Header.Get("LINK")
+		uu := r.Header.Get("UserToAdd")
 		if !c.Private {
 			id := users.UserID(uu)
 			err = ctx.MessagesStore.AddUser(&id, c.ID)
@@ -148,7 +148,7 @@ func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Reques
 		}
 		respond(w, "User has been added")
 	case "UNLINK":
-		uu := r.Header.Get("LINK")
+		uu := r.Header.Get("UserToRemove")
 		if !c.Private {
 			id := users.UserID(uu)
 			err = ctx.MessagesStore.RemoveUser(&id, c.ID)

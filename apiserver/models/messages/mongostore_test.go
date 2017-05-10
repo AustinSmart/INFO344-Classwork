@@ -36,7 +36,7 @@ func TestCRUD(t *testing.T) {
 	if len(string(c.ID)) == 0 {
 		t.Errorf("new ID is zero-length\n")
 	}
-	if len(c.Members) != len(uID) {
+	if len(c.Members) != len(uID)+1 {
 		t.Errorf("inserted channels members is incorrect. expected: %d, recieved: %d\n", len(uID), len(c.Members))
 	}
 
@@ -95,12 +95,12 @@ func TestCRUD(t *testing.T) {
 	}
 
 	uID = append(uID, "4444")
-	err = s.AddUser(&uID[3], c.ID)
+	err = s.AddUser(&uID[len(uID)-1], c.ID)
 	if err != nil {
 		t.Errorf("error adding user: %v\n", err)
 	}
 	allC, err = s.GetAllChannels(uID[0])
-	if allC[0].Members[3] == "" || allC[0].Members[3] != uID[3] {
+	if allC[0].Members[len(allC[0].Members)-1] == "" || allC[0].Members[len(allC[0].Members)-1] != uID[len(uID)-1] {
 		t.Fatalf("AddUser failed. expected: %s. recieved: %s\n", uID[3], allC[0].Members[3])
 	}
 
@@ -109,9 +109,9 @@ func TestCRUD(t *testing.T) {
 		t.Errorf("error removing user: %v\n", err)
 	}
 	allC, err = s.GetAllChannels(uID[0])
-	if len(allC[0].Members) > 3 {
-		if allC[0].Members[3] != "" || allC[0].Members[3] == uID[3] {
-			t.Fatalf("AddUser failed. expected: %s. recieved: %s\n", "nothing", allC[0].Members[3])
+	if len(allC[0].Members) > 4 {
+		if allC[0].Members[4] != "" || allC[0].Members[4] == uID[4] {
+			t.Fatalf("AddUser failed. expected: %s. recieved: %s\n", "nothing", allC[0].Members[4])
 		}
 	}
 
@@ -166,6 +166,6 @@ func TestCRUD(t *testing.T) {
 		t.Fatalf("expected: %d channels, recieved: %d\n", 0, len(allC))
 	}
 
-	sess.DB(s.DatabaseName).C(s.ChannelsCollectionName).RemoveAll(nil)
-	sess.DB(s.DatabaseName).C(s.MessagesCollectionName).RemoveAll(nil)
+	// sess.DB(s.DatabaseName).C(s.ChannelsCollectionName).RemoveAll(nil)
+	// sess.DB(s.DatabaseName).C(s.MessagesCollectionName).RemoveAll(nil)
 }

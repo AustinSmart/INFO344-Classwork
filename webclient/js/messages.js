@@ -31,7 +31,7 @@ window.onload = function() {
             return res.json();
         }).then(function(res) {
             localStorage.setItem("GenMsg", JSON.stringify(res));
-            var messages = JSON.parse(localStorage.getItem("GenMsg"));
+            messages = JSON.parse(localStorage.getItem("GenMsg"));
             renderChannel();
         })
         .catch(function(err) {
@@ -156,14 +156,15 @@ function addMessage(message) {
 
 function renderChannel() {
     messagesContent.innerHTML = "";
-    if(messages) {
-       messages.forEach(function(message) {
+    if(messages != null) {
+        messages.forEach(function(message) {
             renderMessage(message);
         });
     }
 }
 
 function renderMessage(message) {
+    console.log(message.id);
     var li = document.createElement("li");
     li.id = message.id;
     li.classList.add("mdl-list__item", "mdl-list__item--three-line");

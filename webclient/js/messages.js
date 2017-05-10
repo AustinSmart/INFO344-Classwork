@@ -23,6 +23,20 @@ window.onload = function() {
         .catch(function(err) {
             alert(err);
         });
+    fetch(apiRoot + "channels/5912aefcc740d9000105f880",
+        {
+            method: "GET",
+            headers: headers
+        }).then(function(res){
+            return res.json();
+        }).then(function(res) {
+            localStorage.setItem("GenMsg", JSON.stringify(res));
+            var messages = JSON.parse(localStorage.getItem("GenMsg"));
+            renderChannel();
+        })
+        .catch(function(err) {
+            alert(err);
+        });
 };
 // ****************** End Authorization ******************
 
@@ -64,6 +78,8 @@ var inputFieldLarge = document.getElementById("message-input-field-large");
 var inputFieldSmall = document.getElementById("message-input-field-small");
 
 var messagesContent = document.getElementById("messages-content");
+
+var messages;
 // ****************** End Variables ******************
 
 // ****************** Event Listeners ******************
@@ -78,11 +94,6 @@ signOutButtonSmall.addEventListener("click", function() {
 document.getElementById("general-link").addEventListener("click", function() {
     currentChannel.textContent = "#general";
     currentChannel.value = "general"; 
-});
-
-document.getElementById("random-link").addEventListener("click", function() {
-    currentChannel.textContent = "#random";
-    currentChannel.value = "random";
 });
 
 inputFormLarge.addEventListener("submit", function(evt) {
@@ -141,68 +152,66 @@ function addMessage(message) {
     //     }
     // }
     // if(currentChannel.value === "general") messagesGeneralRef.push(message);
-    // if(currentChannel.value === "random") messagesRandomRef.push(message);
 }
 
-function renderChannel(snapshot) {
-    // messagesContent.innerHTML = "";
-    // if(snapshot) {
-    //     snapshot.forEach(function(childSnapshot) {
-    //         renderMessage(childSnapshot);
-    //     });
-    // }
+function renderChannel() {
+    messagesContent.innerHTML = "";
+    if(messages) {
+       messages.forEach(function(message) {
+            renderMessage(message);
+        });
+    }
 }
 
-function renderMessage(childSnapshot) {
-    // var message = childSnapshot.val();
-    // var li = document.createElement("li");
-    // li.id = childSnapshot.key;
-    // li.classList.add("mdl-list__item", "mdl-list__item--three-line");
-    //     var spanPrimary = document.createElement("span");
-    //     spanPrimary.classList.add("mdl-list__item-primary-content");
-    //         var imgAvatar = document.createElement("img");
-    //         imgAvatar.classList.add("material-icons", "mdl-list__item-avatar");
-    //         imgAvatar.src = message.createdBy.photo;
-    //         var spanUserName = document.createElement("span");
-    //         spanUserName.textContent = message.createdBy.displayName;
-    //             var spanTime = document.createElement("span");
-    //             spanTime.classList.add("time");
-    //             spanTime.textContent = " " + moment(message.createdOn).fromNow();
-    //             spanUserName.appendChild(spanTime);
-    //             if(message.edited) {
-    //                 var spanEdited = document.createElement("span");
-    //                 spanEdited.classList.add("time");
-    //                 spanEdited.textContent = " (edited " + moment(message.editedOn).fromNow() + ")";
-    //                 spanUserName.appendChild(spanEdited);
-    //             }
-    //         var spanBody = document.createElement("span");
-    //         spanBody.classList.add("mdl-list__item-text-body");
-    //         spanBody.textContent = message.content ;
-    //     spanPrimary.appendChild(imgAvatar);
-    //     spanPrimary.appendChild(spanUserName);
-    //     spanPrimary.appendChild(spanBody);
-    //     var spanSecondary = document.createElement("span");
-    //     spanSecondary.classList.add("mdl-list__item-secondary-action");
-    //         var button = document.createElement("button");
-    //         button.classList.add("mdl-button", "mdl-button--icon", "mdl-js-button");
-    //             var iAction = document.createElement("i");
-    //             iAction.classList.add("material-icons");
-    //             iAction.textContent = "delete_forever";
-    //             iAction.id = childSnapshot.key;
-    //         button.appendChild(iAction);
-    //     spanSecondary.appendChild(button);
-    //         button = document.createElement("button");
-    //         button.classList.add("mdl-button", "mdl-button--icon", "mdl-js-button");
-    //             iAction = document.createElement("i");
-    //             iAction.classList.add("material-icons");
-    //             iAction.textContent = "mode_edit";
-    //             iAction.id = childSnapshot.key;
-    //         button.appendChild(iAction);
-    //     spanSecondary.appendChild(button);
-    // li.appendChild(spanPrimary);
-    // li.appendChild(spanSecondary);
+function renderMessage(message) {
+    var li = document.createElement("li");
+    li.id = message.id;
+    li.classList.add("mdl-list__item", "mdl-list__item--three-line");
+        var spanPrimary = document.createElement("span");
+        spanPrimary.classList.add("mdl-list__item-primary-content");
+            var imgAvatar = document.createElement("img");
+            imgAvatar.classList.add("material-icons", "mdl-list__item-avatar");
+            imgAvatar.src = "";
+            var spanUserName = document.createElement("span");
+            spanUserName.textContent = message.creatorID;
+                var spanTime = document.createElement("span");
+                spanTime.classList.add("time");
+                spanTime.textContent = " " + message.createdAt;
+                spanUserName.appendChild(spanTime);
+                if(message.editedAt != "") {
+                    var spanEdited = document.createElement("span");
+                    spanEdited.classList.add("time");
+                    spanEdited.textContent = " (edited " + message.editedAt +")";
+                    spanUserName.appendChild(spanEdited);
+                }
+            var spanBody = document.createElement("span");
+            spanBody.classList.add("mdl-list__item-text-body");
+            spanBody.textContent = message.body ;
+        spanPrimary.appendChild(imgAvatar);
+        spanPrimary.appendChild(spanUserName);
+        spanPrimary.appendChild(spanBody);
+        var spanSecondary = document.createElement("span");
+        spanSecondary.classList.add("mdl-list__item-secondary-action");
+            var button = document.createElement("button");
+            button.classList.add("mdl-button", "mdl-button--icon", "mdl-js-button");
+                var iAction = document.createElement("i");
+                iAction.classList.add("material-icons");
+                iAction.textContent = "delete_forever";
+                iAction.id = message.id;
+            button.appendChild(iAction);
+        spanSecondary.appendChild(button);
+            button = document.createElement("button");
+            button.classList.add("mdl-button", "mdl-button--icon", "mdl-js-button");
+                iAction = document.createElement("i");
+                iAction.classList.add("material-icons");
+                iAction.textContent = "mode_edit";
+                iAction.id = message.id;
+            button.appendChild(iAction);
+        spanSecondary.appendChild(button);
+    li.appendChild(spanPrimary);
+    li.appendChild(spanSecondary);
 
-    // messagesContent.appendChild(li);    
+    messagesContent.appendChild(li);    
 }
 
 function deleteMessage(messageID) {
@@ -214,18 +223,7 @@ function deleteMessage(messageID) {
         //                  messagesGeneralRef.child(messageID).remove();
         //         }
         //     }); 
-    }
-    if(currentChannel.value === "random")  {
-        // messagesRandomRef.child(messageID + "/createdBy/displayName").once("value")
-        //     .then(function (snapshot) {
-        //         if(currentUser.displayName === snapshot.val()) {
-        //             if(window.confirm("Delete this message forever?")) {
-        //                 if(currentChannel.value === "random")
-        //                     messagesRandomRef.child(messageID).remove();
-        //             }
-        //         }
-        //     }); 
-    }
+    } 
 }
 
 function editMessage(messageID) {
@@ -241,19 +239,6 @@ function editMessage(messageID) {
         //         }
         //     }
         // });
-    }
-    if(currentChannel.value === "random")  {
-        // messagesRandomRef.child(messageID).once("value")
-        // .then(function (snapshot) {
-        //     if(currentUser.displayName === snapshot.child("createdBy/displayName").val()) {
-        //         var edited = prompt("Edit the message", snapshot.child("content").val());
-        //         if(edited) {
-        //             messagesRandomRef.child(messageID).update({"content": edited});
-        //             messagesRandomRef.child(messageID).update({"edited": true});
-        //             messagesRandomRef.child(messageID).update({"editedOn": firebase.database.ServerValue.TIMESTAMP});
-        //         }
-        //     }
-        // });
-    }
+    } 
 }
 // ****************** End Functions ******************

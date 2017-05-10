@@ -178,26 +178,3 @@ func respond(w http.ResponseWriter, data interface{}) {
 	encoder := json.NewEncoder(w)
 	encoder.Encode(data)
 }
-
-// case "PATCH":
-// 		u := users.User{}
-// 		s := SessionState{
-// 			User: &u,
-// 		}
-// 		sid, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
-// 		if err != nil || sid.String() == "" {
-// 			http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
-// 			return
-// 		}
-// 		uu := &users.UserUpdates{}
-// 		d := json.NewDecoder(r.Body)
-// 		err = d.Decode(uu)
-// 		if err != nil {
-// 			http.Error(w, "Bad JSON:"+err.Error(), http.StatusBadRequest)
-// 		}
-// 		// err = ctx.UserStore.Update(uu, &u)
-// 		// if err != nil {
-// 		// 	http.Error(w, "Error updating user:"+err.Error(), http.StatusInternalServerError)
-// 		// }
-// 		respond(w, u)
-// 	}

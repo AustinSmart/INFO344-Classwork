@@ -40,7 +40,7 @@ func TestCRUD(t *testing.T) {
 		t.Errorf("inserted channels members is incorrect. expected: %d, recieved: %d\n", len(uID), len(c.Members))
 	}
 
-	allC, err := s.GetAllChannels()
+	allC, err := s.GetAllChannels(uID[0])
 	if err != nil {
 		t.Errorf("error getting all channels: %v\n", err)
 	}
@@ -83,7 +83,7 @@ func TestCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("error adding user: %v\n", err)
 	}
-	allC, err = s.GetAllChannels()
+	allC, err = s.GetAllChannels(uID[0])
 	if allC[0].Members[3] == "" || allC[0].Members[3] != uID[3] {
 		t.Fatalf("AddUser failed. expected: %s. recieved: %s\n", uID[3], allC[0].Members[3])
 	}
@@ -92,7 +92,7 @@ func TestCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("error removing user: %v\n", err)
 	}
-	allC, err = s.GetAllChannels()
+	allC, err = s.GetAllChannels(uID[0])
 	if len(allC[0].Members) > 3 {
 		if allC[0].Members[3] != "" || allC[0].Members[3] == uID[3] {
 			t.Fatalf("AddUser failed. expected: %s. recieved: %s\n", "nothing", allC[0].Members[3])
@@ -108,7 +108,7 @@ func TestCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("error udating channel: %v\n", err)
 	}
-	allC, err = s.GetAllChannels()
+	allC, err = s.GetAllChannels(uID[0])
 	if allC[0].Name != cup.Name {
 		t.Fatalf("UpdateChannel name failed. expected: %s. recieved: %s\n", cup.Name, allC[0].Name)
 	}
@@ -142,7 +142,7 @@ func TestCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("error deleting channel: %v\n", err)
 	}
-	allC, err = s.GetAllChannels()
+	allC, err = s.GetAllChannels(uID[0])
 	if err != nil {
 		t.Errorf("error getting all channels: %v\n", err)
 	}

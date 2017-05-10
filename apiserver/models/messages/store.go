@@ -3,10 +3,10 @@ package messages
 import "errors"
 import "github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
 
-//ErrMessageNotFound is returned when the requested user is not found in the store
+//ErrMessageNotFound is returned when the requested message is not found in the store
 var ErrMessageNotFound = errors.New("message not found")
 
-//ErrChannelNotFound is returned when the requested user is not found in the store
+//ErrChannelNotFound is returned when the requested channel is not found in the store
 var ErrChannelNotFound = errors.New("channel not found")
 
 //Store represents an abstract store for model.Channel and model.Message objects.
@@ -15,7 +15,7 @@ var ErrChannelNotFound = errors.New("channel not found")
 //for any persistent database you want (e.g., MongoDB, PostgreSQL, etc.)
 type Store interface {
 	//GetAllChannels returns all channels a user is allowed to see
-	GetAllChannels() ([]*Channel, error)
+	GetAllChannels(user users.UserID) ([]*Channel, error)
 
 	//GetMessages returns `n` number of messages from a channel
 	GetMessages(n int, channel ChannelID) ([]*Message, error)

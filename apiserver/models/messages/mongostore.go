@@ -6,7 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// MongoStore represents a messages.store backed by MongoDB
+//MongoStore represents a messages.store backed by MongoDB
 type MongoStore struct {
 	Session                *mgo.Session
 	DatabaseName           string
@@ -14,7 +14,7 @@ type MongoStore struct {
 	ChannelsCollectionName string
 }
 
-// NewMongoStore returns a new MongoStore
+//NewMongoStore returns a new MongoStore
 func NewMongoStore(session *mgo.Session, dbName string, MessagesCollectionName string, ChannelsCollectionName string) *MongoStore {
 	return &MongoStore{
 		Session:                session,
@@ -25,9 +25,9 @@ func NewMongoStore(session *mgo.Session, dbName string, MessagesCollectionName s
 }
 
 //GetAllChannels returns all channels a user is allowed to see
-func (ms *MongoStore) GetAllChannels() ([]*Channel, error) {
+func (ms *MongoStore) GetAllChannels(user users.UserID) ([]*Channel, error) {
 	channels := []*Channel{}
-	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Find(nil).All(&channels)
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Find(bson.M{"members": user}).All(&channels)
 	if err != nil {
 		return nil, err
 	}

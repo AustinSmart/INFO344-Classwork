@@ -1,14 +1,57 @@
 package handlers
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+
+	"path"
+
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/messages"
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/models/users"
+	"github.com/info344-s17/challenges-AustinSmart/apiserver/sessions"
+)
 
 //ChannelsHandler GET: gets the channels the current user can see
 //POST: add the current user to the new channel's Members list, insert the new channel, and returns the newly-inserted Channel
 func (ctx *Context) ChannelsHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+
+	u := users.User{}
+	s := SessionState{
+		User: &u,
+	}
+	sid, err := sessions.GetState(r, ctx.SessionKey, ctx.SessionStore, &s)
+	if err != nil || sid.String() == "" {
+		http.Error(w, "Error retrieving state:"+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	switch r.Method {
 	case "GET":
+		c, err := ctx.MessagesStore.GetAllChannels(u.ID)
+		if err != nil {
+			http.Error(w, "Error retrieving channels:"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		respond(w, c)
 	case "POST":
+		nc := &messages.NewChannel{}
+		d := json.NewDecoder(r.Body)
+		err := d.Decode(nc)
+		if err != nil {
+			http.Error(w, "Bad JSON:"+err.Error(), http.StatusBadRequest)
+		}
+		c, err := ctx.MessagesStore.InsertChannel(u.ID, nc)
+		if err != nil {
+			http.Error(w, "Error creating channel:"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		err = ctx.MessagesStore.AddUser(&u.ID, c.ID)
+		if err != nil {
+			http.Error(w, "Error creating channel:"+err.Error(), http.StatusInternalServerError)
+			return
+		}
+		respond(w, c)
 	default:
 		http.Error(w, "Request type must be GET or POST", http.StatusBadRequest)
 		return
@@ -22,8 +65,11 @@ func (ctx *Context) ChannelsHandler(w http.ResponseWriter, r *http.Request) {
 //UNLINK: if the specified channel is public, removes the current user from the Members list of the specified channel
 func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
+
+	_, id := path.Split(r.RequestURI)
 	switch r.Method {
 	case "PATCH":
+
 	case "DELETE":
 	case "LINK":
 	case "UNLINK":

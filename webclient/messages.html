@@ -40,6 +40,16 @@
                 <span class="mdl-layout-title">Taut</span>
                 <nav class="mdl-navigation" id="sidebar">
                     <a class="mdl-navigation__link" href="profile.html" id="user-profile-link"></a>
+                    <table class="mdl-data-table mdl-shadow--2dp">
+                         <thead>
+                            <tr>
+                                <th>Members</th>
+                            </tr>
+                        </thead>
+                        <tbody id="members-table">
+                        </tbody>
+                    </table>
+                </nav>
             </div>
             <main class="mdl-layout__content">
                 <div id="page-content">
@@ -72,12 +82,8 @@
             <table class="mdl-data-table mdl-shadow--2dp">
                 <thead>
                     <tr>
-                    <th>
-                        <label class="mdl-checkbox mdl-js-checkbox mdl-js-ripple-effect mdl-data-table__select" for="table-header">
-                            <input type="checkbox" id="table-header" class="mdl-checkbox__input" />
-                        </label>
-                    </th>
-                    <th class="mdl-data-table__cell--non-numeric">Name</th>
+                        <th></th>
+                        <th class="mdl-data-table__cell--non-numeric">Name</th>
                     </tr>
                 </thead>
                 <tbody id="users-table">

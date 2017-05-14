@@ -97,6 +97,7 @@ var addMembersCloseButton = document.getElementById("close-button");
 var addMembersSubmitButton = document.getElementById("add-button");
 
 var usersTable = document.getElementById("users-table");
+var membersTable;
 
 var sidebar = document.getElementById("sidebar");
     
@@ -209,6 +210,9 @@ function addMessage(body) {
 }
 
 function renderSidebar() {
+    var profileLink = sidebar.children[0].cloneNode(true);
+    sidebar.innerHTML = "";
+    sidebar.appendChild(profileLink);
     if (channels != null) {
         channels.forEach(function(channel) {
             var link = document.createElement("a");
@@ -218,6 +222,26 @@ function renderSidebar() {
             link.onclick = function() { changeChannel(channel); }
             sidebar.appendChild(link);
         });
+    if(users != null && typeof currentChannelID != "undefined") { 
+        var table = document.createElement("table");
+        table.classList.add("mdl-data-table");
+            var thead = document.createElement("thead");
+                var tr = document.createElement("tr");
+                    var th = document.createElement("th");
+                    th.innerHTML = "Members";
+                    tr.appendChild(th);
+                thead.appendChild(tr);
+            table.appendChild(thead);
+                var tbody = document.createElement("tbody");
+                tbody.id = "members-table";
+            table.appendChild(tbody);
+        sidebar.appendChild(table);
+        membersTable = document.getElementById("members-table");
+        currentChannelObj.members.forEach(function(member) {
+            renderMember(member)
+        });
+    }
+    
     }
 }
 
@@ -226,6 +250,7 @@ function changeChannel(channel) {
     currentChannelID = channel.id;
     currentChannelObj = channel;
     renderChannel(channel.id)
+    renderSidebar();
 }
 
 function renderChannel(id) {
@@ -364,5 +389,17 @@ function renderUser(user) {
         td.innerHTML = user.userName;
         tr.appendChild(td);
     usersTable.appendChild(tr);
+}
+
+function renderMember(member) {
+     var tr = document.createElement("tr");
+        var td = document.createElement("td");
+        td.classList.add("mdl-data-table__cell--non-numeric");
+        var filteredUsers = users.filter(function(user) {
+                return user.id == member;
+            });
+        td.innerHTML = filteredUsers[0].userName;
+        tr.appendChild(td);
+    membersTable.appendChild(tr);
 }
 // ****************** End Functions ******************

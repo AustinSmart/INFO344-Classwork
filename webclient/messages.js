@@ -15,8 +15,8 @@ window.onload = function() {
             }
             return res.json();
         }).then(function(res) {
-            localStorage.setItem("User", JSON.stringify(res));
-            var currentUser = JSON.parse(localStorage.getItem("User"));
+            localStorage.setItem("user", JSON.stringify(res));
+            var currentUser = JSON.parse(localStorage.getItem("user"));
             var userProfile = document.getElementById("user-profile-link");
                 userProfile.innerHTML = currentUser.userName;
         })
@@ -24,6 +24,21 @@ window.onload = function() {
             alert(err);
         });
         // ****************** End Authorization ******************
+    fetch(apiRoot + "users",
+        {
+            method: "GET",
+            headers: headers
+        })
+        .then(function(res){
+            return res.json();
+        }).then(function(res) {
+            localStorage.setItem("users", JSON.stringify(res));
+            users = JSON.parse(localStorage.getItem("users"));
+        })
+        .catch(function(err) {
+            alert(err);
+        });
+         
     fetch(apiRoot + "channels",
         {
             method: "GET",
@@ -31,8 +46,8 @@ window.onload = function() {
         }).then(function(res){
             return res.json();
         }).then(function(res) {
-            localStorage.setItem("Channels", JSON.stringify(res));
-            channels = JSON.parse(localStorage.getItem("Channels"));
+            localStorage.setItem("channels", JSON.stringify(res));
+            channels = JSON.parse(localStorage.getItem("channels"));
             renderSidebar();
         })
         .catch(function(err) {
@@ -66,11 +81,22 @@ onReady(function () {
 var headers = new Headers();
 
 var currentChannel = document.getElementById("current-channel");
+var currentChannelObj;
 var currentChannelID;
 var channels;
 
 var messagesContent = document.getElementById("messages-content");
 var messages;
+
+var users;
+
+var addMembersDialog = document.getElementById("add-members");
+var addMembersOpenButton = document.getElementById("add-members-button");
+
+var addMembersCloseButton = document.getElementById("close-button");
+var addMembersSubmitButton = document.getElementById("add-button");
+
+var usersTable = document.getElementById("users-table");
 
 var sidebar = document.getElementById("sidebar");
     
@@ -87,13 +113,6 @@ var inputFieldSmall = document.getElementById("message-input-field-small");
 // ****************** End Variables ******************
 
 // ****************** Event Listeners ******************
-signOutButtonLarge.addEventListener("click", function() {
-    signOut();   
-});
-
-signOutButtonSmall.addEventListener("click", function() {
-    signOut();
-});
 
 inputFormLarge.addEventListener("submit", function(evt) {
     evt.preventDefault();
@@ -114,6 +133,24 @@ document.querySelector("main").addEventListener("click", function(event) {
       editMessage(event.target.id);
   }
 });
+
+if (! addMembersDialog.showModal) {
+    dialogPolyfill.registerDialog(addMembersDialog);
+}
+
+var showDialogHandler = function(event) {
+   if(typeof currentChannelID != "undefined") {
+        addMembersDialog.showModal();
+        populateUsersTable();
+   }
+};
+addMembersCloseButton.addEventListener("click", function() {
+    addMembersDialog.close();
+});
+addMembersSubmitButton.addEventListener("click", function() {
+     addMembersDialog.close();
+});
+
 // ****************** End Event Listeners ******************
 
 // ****************** Functions ******************
@@ -187,6 +224,7 @@ function renderSidebar() {
 function changeChannel(channel) {
     currentChannel.innerHTML = channel.name;
     currentChannelID = channel.id;
+    currentChannelObj = channel;
     renderChannel(channel.id)
 }
 
@@ -293,5 +331,38 @@ function deleteMessage(messageID) {
 
 function editMessage(messageID) {
     
+}
+
+function populateUsersTable() {
+    if(users != null) {
+        var filteredUsers = users.filter(
+            function(user){
+                return currentChannelObj.members.indexOf(user.id) < 0;
+            });
+        usersTable.innerHTML = "";
+        filteredUsers.forEach(function(user) {
+            renderUser(user)
+        });
+    }
+}
+
+function renderUser(user) {
+    var tr = document.createElement("tr");
+        var td = document.createElement("td");
+            var label = document.createElement("label");
+            label.classList.add("mdl-checkbox", "mdl-js-checkbox", "mdl-js-ripple-effect", "mdl-data-table__select");
+            label.setAttribute("for", user.id);
+                var input = document.createElement("input");
+                input.classList.add("mdl-checkbox__input");
+                input.setAttribute("type", "checkbox");
+                input.id = user.id;
+                label.appendChild(input);
+            td.appendChild(label);
+        tr.appendChild(td);
+        td = document.createElement("td");
+        td.classList.add("mdl-data-table__cell--non-numeric");
+        td.innerHTML = user.userName;
+        tr.appendChild(td);
+    usersTable.appendChild(tr);
 }
 // ****************** End Functions ******************

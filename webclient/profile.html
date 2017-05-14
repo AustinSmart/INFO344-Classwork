@@ -27,18 +27,16 @@
                     </div>
                     <div class="mdl-layout-spacer"></div>
                     <nav class="mdl-navigation">
-                        <button class="mdl-layout--large-screen-only mdl-button mdl-js-button 
-                        mdl-button--raised mdl-button--accent mdl-js-ripple-effect" id="sign-out-button-large">Sign Out</button>
+                        <button id="menu"  class="mdl-button mdl-js-button mdl-button--icon"> <i class="material-icons">more_vert</i></button>
+                        <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
+                            for="menu">
+                        <li class="mdl-menu__item" onclick="signOut()">Sign Out</li>
+                        </ul>
                     </nav>
                 </div>
             </header>
             <div class="mdl-layout__drawer mdl-color--orange-300">
-                <span class="mdl-layout-title">Taut</span>
-                <nav class="mdl-navigation">
-                <nav class="mdl-navigation">
-                        <button class="mdl-layout--small-screen-only mdl-button mdl-js-button 
-                        mdl-button--raised mdl-button--colored mdl-js-ripple-effect" id="sign-out-button-small">Sign Out</button>
-                </nav>
+                <span class="mdl-layout-title">Taut</span>    
             </div>
             <main class="mdl-layout__content">
                 <div id="page-content">

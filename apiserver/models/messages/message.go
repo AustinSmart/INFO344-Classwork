@@ -11,12 +11,14 @@ type MessageID string
 
 //Message represents a message in a channel
 type Message struct {
-	ID        MessageID    `json:"id" bson:"_id"`
-	ChannelID ChannelID    `json:"channelID"`
-	Body      string       `json:"body"`
-	CreatedAt string       `json:"createdAt"`
-	CreatorID users.UserID `json:"creatorID"`
-	EditedAt  string       `json:"editedAt"`
+	ID              MessageID    `json:"id" bson:"_id"`
+	ChannelID       ChannelID    `json:"channelID"`
+	Body            string       `json:"body"`
+	CreatedAt       string       `json:"createdAt"`
+	CreatorID       users.UserID `json:"creatorID"`
+	CreatorName     string       `json:"creatorName"`
+	CreatorPhotoURL string       `json:"creatorPhotoUrl"`
+	EditedAt        string       `json:"editedAt"`
 }
 
 //NewMessage represnts a new message to be added to a channel

@@ -77,10 +77,12 @@ func (ms *MongoStore) InsertChannel(user users.UserID, newChannel *NewChannel) (
 }
 
 //InsertMessage creates a new message
-func (ms *MongoStore) InsertMessage(user users.UserID, newMessage *NewMessage) (*Message, error) {
+func (ms *MongoStore) InsertMessage(user users.User, newMessage *NewMessage) (*Message, error) {
 	message := newMessage.ToMessage()
 	message.ID = MessageID(bson.NewObjectId().Hex())
-	message.CreatorID = user
+	message.CreatorID = user.ID
+	message.CreatorName = user.FirstName + " " + user.LastName
+	message.CreatorPhotoURL = user.PhotoURL
 	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Insert(message)
 	return message, err
 }

@@ -18,7 +18,14 @@ func TestCRUD(t *testing.T) {
 	s := NewMongoStore(sess, "devData", "devMessages", "devChannels")
 
 	uID := []users.UserID{"11111", "22222", "33333"}
-
+	user := users.User{
+		ID:        "11111",
+		Email:     "austin@austinsmart.com",
+		UserName:  "AustinSmart",
+		FirstName: "Austin",
+		LastName:  "Smart",
+		PhotoURL:  "http://someurl.com",
+	}
 	nc := &NewChannel{
 		Name:        "Test Channel",
 		Description: "This is only a test",
@@ -60,8 +67,8 @@ func TestCRUD(t *testing.T) {
 		ChannelID: c.ID,
 		Body:      "This is a test message",
 	}
-	m, err := s.InsertMessage(uID[0], nm)
-	m, err = s.InsertMessage(uID[0], nm)
+	m, err := s.InsertMessage(user, nm)
+	m, err = s.InsertMessage(user, nm)
 	if err != nil {
 		t.Errorf("error inserting message: %v\n", err)
 	}

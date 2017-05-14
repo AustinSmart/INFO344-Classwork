@@ -199,7 +199,7 @@ func (ctx *Context) MessagesHandler(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Bad JSON:"+err.Error(), http.StatusBadRequest)
 	}
-	m, err := ctx.MessagesStore.InsertMessage(u.ID, nm)
+	m, err := ctx.MessagesStore.InsertMessage(u, nm)
 	if err != nil {
 		http.Error(w, "Error creating message:"+err.Error(), http.StatusInternalServerError)
 		return

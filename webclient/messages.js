@@ -89,6 +89,7 @@ var messagesContent = document.getElementById("messages-content");
 var messages;
 
 var users;
+var addUsers;
 
 var addMembersDialog = document.getElementById("add-members");
 var addMembersOpenButton = document.getElementById("add-members-button");
@@ -96,7 +97,8 @@ var addMembersOpenButton = document.getElementById("add-members-button");
 var addMembersCloseButton = document.getElementById("close-button");
 var addMembersSubmitButton = document.getElementById("add-button");
 
-var usersTable = document.getElementById("users-table");
+var usersTableBody = document.getElementById("users-table");
+var usersTableMain = document.getElementById("users-table-main");
 var membersTable;
 
 var sidebar = document.getElementById("sidebar");
@@ -150,8 +152,8 @@ addMembersCloseButton.addEventListener("click", function() {
 });
 addMembersSubmitButton.addEventListener("click", function() {
      addMembersDialog.close();
+     addUsers = Array.from(new Set(addUsers));
 });
-
 // ****************** End Event Listeners ******************
 
 // ****************** Functions ******************
@@ -206,7 +208,6 @@ function addMessage(body) {
         .catch(function(err) {
             alert(err);
         });
-
 }
 
 function renderSidebar() {
@@ -364,15 +365,26 @@ function populateUsersTable() {
             function(user){
                 return currentChannelObj.members.indexOf(user.id) < 0;
             });
-        usersTable.innerHTML = "";
+        usersTableBody.innerHTML = "";
         filteredUsers.forEach(function(user) {
             renderUser(user)
         });
+        addUsers = [];
+        var checkboxes = usersTableBody.querySelectorAll('.mdl-checkbox__input');
+        for (var i = 0; i < checkboxes.length; i++) {
+            checkboxes[i].addEventListener('change', function(e) {
+                if (!e.target.tagName === 'input' || e.target.getAttribute('type') !== 'checkbox') { 
+                    return;
+                }
+                addUsers.push(this.id);
+            });
+        }
     }
 }
 
 function renderUser(user) {
     var tr = document.createElement("tr");
+    tr.id = user.id;
         var td = document.createElement("td");
             var label = document.createElement("label");
             label.classList.add("mdl-checkbox", "mdl-js-checkbox", "mdl-js-ripple-effect", "mdl-data-table__select");
@@ -388,7 +400,7 @@ function renderUser(user) {
         td.classList.add("mdl-data-table__cell--non-numeric");
         td.innerHTML = user.userName;
         tr.appendChild(td);
-    usersTable.appendChild(tr);
+    usersTableBody.appendChild(tr);
 }
 
 function renderMember(member) {

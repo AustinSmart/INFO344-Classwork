@@ -51,6 +51,11 @@ func (ctx *Context) ChannelsHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Error creating channel:"+err.Error(), http.StatusInternalServerError)
 			return
 		}
+		cEv := messages.ChannelEvent{
+			Type:    "New Channel",
+			Channel: c,
+		}
+		ctx.Notifier.Notify(cEv)
 		respond(w, c)
 	default:
 		http.Error(w, "Request type must be GET or POST", http.StatusBadRequest)
@@ -113,6 +118,11 @@ func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Reques
 			}
 			c.Name = cu.Name
 			c.Description = cu.Description
+			cEv := messages.ChannelEvent{
+				Type:    "Channel Updated",
+				Channel: c,
+			}
+			ctx.Notifier.Notify(cEv)
 			respond(w, c)
 		}
 	case "DELETE":
@@ -121,6 +131,11 @@ func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Reques
 			if err != nil {
 				http.Error(w, "Error deleting channel:"+err.Error(), http.StatusInternalServerError)
 			}
+			cEv := messages.ChannelEvent{
+				Type:    "Channel Deleted",
+				Channel: c,
+			}
+			ctx.Notifier.Notify(cEv)
 			respond(w, "Channel deleted")
 		} else {
 			http.Error(w, "You must own channel to delete it", http.StatusUnauthorized)
@@ -146,6 +161,11 @@ func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Reques
 				return
 			}
 		}
+		cEv := messages.ChannelEvent{
+			Type:    "Channel Updated",
+			Channel: c,
+		}
+		ctx.Notifier.Notify(cEv)
 		respond(w, "User has been added")
 	case "UNLINK":
 		uu := r.Header.Get("UserToRemove")
@@ -167,6 +187,11 @@ func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Reques
 				return
 			}
 		}
+		cEv := messages.ChannelEvent{
+			Type:    "Channel Updated",
+			Channel: c,
+		}
+		ctx.Notifier.Notify(cEv)
 		respond(w, "User has been removed")
 	default:
 		http.Error(w, "Request type must be PATCH, DELETE, LINK, or UNLINK", http.StatusBadRequest)
@@ -204,6 +229,11 @@ func (ctx *Context) MessagesHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error creating message:"+err.Error(), http.StatusInternalServerError)
 		return
 	}
+	mEv := messages.MessageEvent{
+		Type:    "New Message",
+		Message: m,
+	}
+	ctx.Notifier.Notify(mEv)
 	respond(w, m)
 }
 
@@ -244,6 +274,11 @@ func (ctx *Context) SpecificMessageHandler(w http.ResponseWriter, r *http.Reques
 				return
 			}
 			m.Body = mu.Body
+			mEv := messages.MessageEvent{
+				Type:    "Message Updated",
+				Message: m,
+			}
+			ctx.Notifier.Notify(mEv)
 			respond(w, m)
 		} else {
 			http.Error(w, "Only the message creator may update a message", http.StatusUnauthorized)
@@ -256,6 +291,11 @@ func (ctx *Context) SpecificMessageHandler(w http.ResponseWriter, r *http.Reques
 				http.Error(w, "Error deleting message:"+err.Error(), http.StatusInternalServerError)
 				return
 			}
+			mEv := messages.MessageEvent{
+				Type:    "Message Deleted",
+				Message: m,
+			}
+			ctx.Notifier.Notify(mEv)
 			respond(w, "Message deleted")
 		} else {
 			http.Error(w, "Only the message creator may delete a message", http.StatusUnauthorized)

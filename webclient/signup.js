@@ -39,7 +39,7 @@ signUpForm.addEventListener("submit", function(evt) {
                 lastname: lastNameInput.value
             };
         var data = JSON.stringify(input)
-        fetch(apiRoot + "users",
+        fetch(httpConnection + apiRoot + "users",
         {
             method: "POST",
             body: data

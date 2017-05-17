@@ -32,6 +32,8 @@ const (
 	apiMessages        = apiRoot + "messages"
 	apiSpecificMessage = apiMessages + "/"
 
+	apiWebSocket = apiRoot + "websocket"
+
 	defaultPort = "443"
 )
 
@@ -69,7 +71,9 @@ func main() {
 		SessionStore:  sessions.NewRedisStore(client, -1),
 		UserStore:     mongoUsersStore,
 		MessagesStore: mongoMessagesStore,
+		Notifier:      handlers.NewNotifier(),
 	}
+	go ctx.Notifier.Start()
 
 	mux := http.NewServeMux()
 	mux.HandleFunc(apiSummary, handlers.SummaryHandler)
@@ -81,6 +85,7 @@ func main() {
 	mux.HandleFunc(apiSpecificChannel, ctx.SpecificChannelHandler)
 	mux.HandleFunc(apiMessages, ctx.MessagesHandler)
 	mux.HandleFunc(apiSpecificMessage, ctx.SpecificMessageHandler)
+	mux.HandleFunc(apiWebSocket, ctx.WebSocketUpgradeHandler)
 
 	http.Handle(apiRoot, middleware.Adapt(mux, middleware.CORS("", "", "", "")))
 

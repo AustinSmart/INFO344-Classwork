@@ -1,4 +1,6 @@
 "use strict"
-var apiRoot = "https://info344api.austinsmart.com/v1/";
+const httpConnection = "https://info344api.austinsmart.com"
+const webSocketConnection = "wss://info344api.austinsmart.com"
+const apiRoot = "/v1/";
 const headerAuthorization = "Authorization"
 

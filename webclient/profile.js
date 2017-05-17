@@ -4,7 +4,7 @@
 window.onload = function() {
     var headers = new Headers();
     headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "users/me",
+    fetch(httpConnection + apiRoot + "users/me",
         {
             method: "GET",
             headers: headers
@@ -53,7 +53,7 @@ updateForm.addEventListener("submit", function(evt) {
         var data = JSON.stringify(input)
         var headers = new Headers();
         headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-        fetch(apiRoot + "users/me",
+        fetch(httpConnection + apiRoot + "users/me",
         {
             method: "PATCH",
             body: data,
@@ -97,7 +97,7 @@ function signOut() {
     spinner.classList.add("is-active");
     var headers = new Headers();
     headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "sessions/mine",
+    fetch(httpConnection + apiRoot + "sessions/mine",
         {
             method: "DELETE",
             headers: headers

@@ -14,7 +14,7 @@ signInForm.addEventListener("submit", function(evt) {
                 password: passwordInput.value,
             };
         var data = JSON.stringify(input)
-        fetch(apiRoot + "sessions",
+        fetch(httpConnection + apiRoot + "sessions",
         {
             method: "POST",
             body: data

@@ -4,7 +4,7 @@
 window.onload = function() {
     // ****************** Authorization ******************
     headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "users/me",
+    fetch(httpConnection + apiRoot + "users/me",
         {
             method: "GET",
             headers: headers
@@ -12,7 +12,7 @@ window.onload = function() {
         .then(function(res){
             if (!res.ok) {
                 window.location.href = "index.html";
-            }
+            } 
             return res.json();
         }).then(function(res) {
             localStorage.setItem("user", JSON.stringify(res));
@@ -24,13 +24,19 @@ window.onload = function() {
             alert(err);
         });
         // ****************** End Authorization ******************
-    fetch(apiRoot + "users",
+    fetch(httpConnection + apiRoot + "users",
         {
             method: "GET",
             headers: headers
         })
         .then(function(res){
-            return res.json();
+            if(res.ok) {
+                return res.json();
+            } else {
+                res.text().then(function (text) {
+                    alert("Error: " + text);
+                });
+            }
         }).then(function(res) {
             localStorage.setItem("users", JSON.stringify(res));
             users = JSON.parse(localStorage.getItem("users"));
@@ -39,12 +45,18 @@ window.onload = function() {
             alert(err);
         });
          
-    fetch(apiRoot + "channels",
+    fetch(httpConnection + apiRoot + "channels",
         {
             method: "GET",
             headers: headers
         }).then(function(res){
-            return res.json();
+            if(res.ok) {
+                return res.json();
+            } else {
+                res.text().then(function (text) {
+                    alert("Error: " + text);
+                });
+            }
         }).then(function(res) {
             localStorage.setItem("channels", JSON.stringify(res));
             channels = JSON.parse(localStorage.getItem("channels"));
@@ -53,6 +65,87 @@ window.onload = function() {
         .catch(function(err) {
             alert(err);
         });
+
+    var websocket = new WebSocket(webSocketConnection + apiRoot+ "websocket?" + headerAuthorization + "=" + localStorage.getItem(headerAuthorization));
+    websocket.onmessage =  function(wsevent) {
+        var msg = JSON.parse(event.data);
+        console.log(msg);
+        switch(msg.type) {
+            case "New Message":
+            case "Message Updated":
+                var currChannel = channels.filter(function(channel) {
+                        return channel.id == msg.Message.channelID;
+                    });
+                if(currChannel.length > 0) {
+                    var saveMessages = JSON.parse(localStorage.getItem(msg.Message.channelID));
+                    saveMessages.push(msg.Message);
+                    localStorage.setItem(msg.Message.channelID, JSON.stringify(saveMessages));
+                    messages = JSON.parse(localStorage.getItem(currentChannelID));
+                    if(messages != null) {
+                        messagesContent.innerHTML = "";
+                        messages.forEach(function(message) {
+                            renderMessage(message);
+                        });
+                    }
+                }
+                break;
+            case "Message Deleted":
+                var currChannel = channels.filter(function(channel) {
+                        return channel.id == msg.Message.channelID;
+                    });
+                if(currChannel.length > 0) {
+                    messages = JSON.parse(localStorage.getItem(currentChannelID));
+                    messages = messages.filter(function(message) {
+                        return message.id != msg.Message.id;
+                    });
+                    if(messages != null) {
+                        messagesContent.innerHTML = "";
+                        messages.forEach(function(message) {
+                            renderMessage(message);
+                        });
+                    }
+                }
+                break;
+            case "New Channel":
+                //TODO add private channel member check
+                if(msg.channel.private === false ) {
+                    channels = JSON.parse(localStorage.getItem("channels"));
+                    channels.push(msg.channel);
+                    localStorage.setItem("channels", JSON.stringify(channels));
+                    renderSidebar();
+                }
+                break;
+            case "Channel Updated":
+                if(msg.channel.private === false ) {
+                    channels = JSON.parse(localStorage.getItem("channels"));
+                    var filteredChannels = channels.filter(
+                        function(channel){
+                            return channel.id !== msg.channel.id;
+                    });
+                    filteredChannels.push(msg.channel);
+                    localStorage.setItem("channels", JSON.stringify(filteredChannels));
+                    renderSidebar();
+                }
+                break;
+            case "Channel Deleted":
+                if(msg.channel.private === false ) {
+                    channels = JSON.parse(localStorage.getItem("channels"));
+                    var filteredChannels = channels.filter(
+                        function(channel){
+                            return channel.id !== msg.channel.id;
+                    });
+                    localStorage.setItem("channels", JSON.stringify(filteredChannels));
+                    renderSidebar();
+                }
+                break;
+            case "New User":
+                break;
+            case "User Joined Channel":
+                break;
+            case "User Left Channel":
+                break;
+        };
+    };
 };
 // ****************** End Onload ******************
 
@@ -81,6 +174,7 @@ onReady(function () {
 var headers = new Headers();
 
 var currentChannel = document.getElementById("current-channel");
+// var currentChannelDescription = document.getElementById("current-channel-description");
 var currentChannelObj;
 var currentChannelID;
 var channels;
@@ -185,7 +279,7 @@ function signOut() {
     spinner.classList.add("is-active");
     var headers = new Headers();
     headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "sessions/mine",
+    fetch(httpConnection + apiRoot + "sessions/mine",
         {
             method: "DELETE",
             headers: headers
@@ -194,7 +288,7 @@ function signOut() {
             if (res.ok) {
                 localStorage.clear();
                 window.location.href = "index.html";
-            } else {
+            } else { 
                 res.text().then(function (text) {
                     alert("Error: " + text);
                 });
@@ -211,25 +305,20 @@ function addMessage(body) {
     }
 
     headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "messages",
+    fetch(httpConnection + apiRoot + "messages",
         {
             method: "POST",
             headers: headers,
             body: JSON.stringify(message)
         }).then(function(res){
-            return res.json();
-        }).then(function(res) {
-            messages = JSON.parse(localStorage.getItem(currentChannelID));
-            messages.push(res);
-            localStorage.setItem(currentChannelID, JSON.stringify(messages));
-             messagesContent.innerHTML = "";
-            if(messages != null) {
-                messages.forEach(function(message) {
-                    renderMessage(message);
+           if(res.ok) {
+                return res.json();
+            } else {
+                res.text().then(function (text) {
+                    alert("Error: " + text);
                 });
             }
-        })
-        .catch(function(err) {
+        }).catch(function(err) {
             alert(err);
         });
 }
@@ -238,6 +327,7 @@ function renderSidebar() {
     var profileLink = sidebar.children[0].cloneNode(true);
     sidebar.innerHTML = "";
     sidebar.appendChild(profileLink);
+    channels = JSON.parse(localStorage.getItem("channels"));
     if (channels != null) {
         channels.forEach(function(channel) {
             var link = document.createElement("a");
@@ -272,22 +362,29 @@ function renderSidebar() {
 
 function changeChannel(channel) {
     currentChannel.innerHTML = channel.name;
+    // currentChannelDescription.innerHTML = channel.description;
     currentChannelID = channel.id;
     currentChannelObj = channel;
     renderChannel(channel.id)
-    renderSidebar();
+    // renderSidebar();
 }
 
 function renderChannel(id) {
     messagesContent.innerHTML = "";
     messages = null;
     headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "channels/" + id,
+    fetch(httpConnection + apiRoot + "channels/" + id,
         {
             method: "GET",
             headers: headers
         }).then(function(res){
-            return res.json();
+           if(res.ok) {
+                return res.json();
+            } else {
+                res.text().then(function (text) {
+                    alert("Error: " + text);
+                });
+            }
         }).then(function(res) {
             localStorage.setItem(id, JSON.stringify(res));
             messages = JSON.parse(localStorage.getItem(id));
@@ -355,26 +452,19 @@ function renderMessage(message) {
 
 function deleteMessage(messageID) {
    headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "messages/" + messageID,
+    fetch(httpConnection + apiRoot + "messages/" + messageID,
         {
             method: "DELETE",
             headers: headers
         }).then(function(res){
-            return res.json();
-        }).then(function(res) {
-            messages = JSON.parse(localStorage.getItem(currentChannelID));
-            messages = messages.filter(function(message) {
-                return message.id != messageID;
-            });
-            localStorage.setItem(currentChannelID, JSON.stringify(messages));
-            messagesContent.innerHTML = "";
-            if(messages != null) {
-                messages.forEach(function(message) {
-                    renderMessage(message);
+           if(res.ok) {
+                return res.json();
+            } else {
+                res.text().then(function (text) {
+                    alert("Error: " + text);
                 });
             }
-        })
-        .catch(function(err) {
+        }).catch(function(err) {
             alert(err);
         });
 } 
@@ -441,18 +531,20 @@ function renderUser(user) {
 
 function createChannel(newChannel) {
     headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(apiRoot + "channels",
+    fetch(httpConnection + apiRoot + "channels",
         {
             method: "POST",
             headers: headers
         }).then(function(res){
-            return res.json();
+           if(res.ok) {
+                return res.json();
+            } else {
+                res.text().then(function (text) {
+                    alert("Error: " + text);
+                });
+            }
         }).then(function(res) {
             messages = JSON.parse(localStorage.getItem(currentChannelID));
-            messages = messages.filter(function(message) {
-                return message.id != messageID;
-            });
-            localStorage.setItem(currentChannelID, JSON.stringify(messages));
             messagesContent.innerHTML = "";
             if(messages != null) {
                 messages.forEach(function(message) {

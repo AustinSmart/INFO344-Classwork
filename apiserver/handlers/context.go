@@ -12,5 +12,5 @@ type Context struct {
 	SessionStore  sessions.Store
 	UserStore     users.Store
 	MessagesStore messages.Store
-	Notifier      Notifier
+	Notifier      *Notifier
 }

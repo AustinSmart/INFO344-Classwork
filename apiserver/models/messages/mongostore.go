@@ -29,7 +29,7 @@ func NewMongoStore(session *mgo.Session, dbName string, MessagesCollectionName s
 //GetAllChannels returns all channels a user is allowed to see
 func (ms *MongoStore) GetAllChannels(user users.UserID) ([]*Channel, error) {
 	channels := []*Channel{}
-	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Find(bson.M{"members": user}).All(&channels)
+	err := ms.Session.DB(ms.DatabaseName).C(ms.ChannelsCollectionName).Find(bson.M{"$or": []bson.M{bson.M{"members": user}, bson.M{"private": false}}}).All(&channels)
 	if err != nil {
 		return nil, err
 	}

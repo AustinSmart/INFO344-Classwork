@@ -38,8 +38,6 @@ var displayNameInput = document.getElementById("display-name-input");
 var emailInput = document.getElementById("email-input");
    emailInput.value = currentUser.email;
 
-var signOutButtonLarge = document.getElementById("sign-out-button-large");
-var signOutButtonSmall = document.getElementById("sign-out-button-small");
 // ****************** End Variables ******************
 
 // ****************** Event Listeners ******************
@@ -75,14 +73,6 @@ updateForm.addEventListener("submit", function(evt) {
             alert(err);
         });
     }
-});
-
-signOutButtonLarge.addEventListener("click", function() {
-    signOut();   
-});
-
-signOutButtonSmall.addEventListener("click", function() {
-    signOut();
 });
 // ****************** End Event Listeners ******************
 

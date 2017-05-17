@@ -7,6 +7,7 @@ import (
 	"os"
 
 	mgo "gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	redis "gopkg.in/redis.v5"
 
 	"github.com/info344-s17/challenges-AustinSmart/apiserver/handlers"
@@ -84,6 +85,7 @@ func main() {
 	http.Handle(apiRoot, middleware.Adapt(mux, middleware.CORS("", "", "", "")))
 
 	//General channel for all users
+	mongoSession.DB(mongoMessagesStore.DatabaseName).C(mongoMessagesStore.ChannelsCollectionName).RemoveAll(bson.M{"name": "General"})
 	nc := &messages.NewChannel{
 		Name:        "General",
 		Description: "A public channel for all users of Taut",

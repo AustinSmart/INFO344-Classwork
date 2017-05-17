@@ -30,7 +30,8 @@
                         <button id="menu"  class="mdl-button mdl-js-button mdl-button--icon"> <i class="material-icons">more_vert</i></button>
                         <ul class="mdl-menu mdl-menu--bottom-right mdl-js-menu mdl-js-ripple-effect"
                             for="menu">
-                        <li class="mdl-menu__item" onclick="showDialogHandler()">Add Members</li>
+                        <li class="mdl-menu__item" onclick="showChannelDialogHandler()">Add Channel</li>
+                        <li class="mdl-menu__item" onclick="showNewChannelDialogHandler()">New Channel</li>
                         <li class="mdl-menu__item" onclick="signOut()">Sign Out</li>
                         </ul>
                     </nav>
@@ -40,10 +41,10 @@
                 <span class="mdl-layout-title">Taut</span>
                 <nav class="mdl-navigation" id="sidebar">
                     <a class="mdl-navigation__link" href="profile.html" id="user-profile-link"></a>
-                    <table class="mdl-data-table mdl-shadow--2dp">
+                    <!--<table class="mdl-data-table mdl-shadow--2dp">
                         <tbody id="members-table">
                         </tbody>
-                    </table>
+                    </table>-->
                 </nav>
             </div>
             <main class="mdl-layout__content">
@@ -72,22 +73,31 @@
             </footer>
         </div>
     </body>
-    <dialog class="mdl-dialog" id="add-members">
+    <dialog class="mdl-dialog" id="add-new-channel">
         <div class="mdl-dialog__content">  
-            <table id="users-table-main" class="mdl-data-table mdl-shadow--2dp">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th class="mdl-data-table__cell--non-numeric">Name</th>
-                    </tr>
-                </thead>
-                <tbody id="users-table">
-                </tbody>
-            </table>
+            <form id="new-channel-form" action="#">
+					<div class="mdl-textfield mdl-js-textfield">
+						<input id="new-channel-form-name" class="mdl-textfield__input" type="text" />
+						<label class="mdl-textfield__label" for="name">Channel Name</label>
+					</div>
+					<div class="mdl-textfield mdl-js-textfield">
+						<input id="new-channel-form-description" class="mdl-textfield__input" type="text"/>
+						<label class="mdl-textfield__label" for="description">Description</label>
+					</div>
+			</form>
         </div>
         <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
             <button id="add-button" type="button" class="mdl-button">Add</button>
             <button id="close-button" type="button" class="mdl-button" >Close</button>
+        </div>
+    </dialog>
+     <dialog class="mdl-dialog" id="add-channel">
+        <div class="mdl-dialog__content">  
+            
+        </div>
+        <div class="mdl-dialog__actions mdl-dialog__actions--full-width">
+            <button id="add-channel-button" type="button" class="mdl-button">Add</button>
+            <button id="channel-close-button" type="button" class="mdl-button" >Close</button>
         </div>
     </dialog>
 </html>

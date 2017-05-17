@@ -33,7 +33,15 @@ func TestCRUD(t *testing.T) {
 		Private:     false,
 	}
 
+	nc2 := &NewChannel{
+		Name:        "Test Channel",
+		Description: "This is only a test",
+		Members:     nil,
+		Private:     false,
+	}
+
 	c, err := s.InsertChannel(uID[0], nc)
+	_, err = s.InsertChannel(uID[1], nc2)
 	if err != nil {
 		t.Errorf("error inserting channel: %v\n", err)
 	}
@@ -59,8 +67,8 @@ func TestCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("error getting all channels: %v\n", err)
 	}
-	if len(allC) != 1 {
-		t.Fatalf("expected: %d channels, recieved: %d\n", 1, len(allC))
+	if len(allC) != 2 {
+		t.Fatalf("expected: %d channels, recieved: %d\n", 2, len(allC))
 	}
 
 	nm := &NewMessage{
@@ -169,10 +177,10 @@ func TestCRUD(t *testing.T) {
 	if err != nil {
 		t.Errorf("error getting all channels: %v\n", err)
 	}
-	if len(allC) != 0 {
-		t.Fatalf("expected: %d channels, recieved: %d\n", 0, len(allC))
+	if len(allC) != 1 {
+		t.Fatalf("expected: %d channels, recieved: %d\n", 1, len(allC))
 	}
 
-	// sess.DB(s.DatabaseName).C(s.ChannelsCollectionName).RemoveAll(nil)
-	// sess.DB(s.DatabaseName).C(s.MessagesCollectionName).RemoveAll(nil)
+	sess.DB(s.DatabaseName).C(s.ChannelsCollectionName).RemoveAll(nil)
+	sess.DB(s.DatabaseName).C(s.MessagesCollectionName).RemoveAll(nil)
 }

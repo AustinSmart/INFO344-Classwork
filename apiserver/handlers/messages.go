@@ -91,7 +91,7 @@ func (ctx *Context) SpecificChannelHandler(w http.ResponseWriter, r *http.Reques
 				isMem = true
 			}
 		}
-		if c.Private || isMem {
+		if !c.Private || isMem {
 			msgs, err := ctx.MessagesStore.GetMessages(500, c.ID)
 			if err != nil {
 				http.Error(w, "Error getting messages:"+err.Error(), http.StatusInternalServerError)

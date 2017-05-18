@@ -65,7 +65,7 @@ func (ms *MongoStore) GetByUserName(name string) (*User, error) {
 // and returns a User with a newly-assigned ID
 func (ms *MongoStore) Insert(newUser *NewUser) (*User, error) {
 	u, err := newUser.ToUser()
-	u.ID = UserID(bson.NewObjectId())
+	u.ID = UserID(bson.NewObjectId().Hex())
 	err = ms.Session.DB(ms.DatabaseName).C(ms.CollectionName).Insert(u)
 	return u, err
 }

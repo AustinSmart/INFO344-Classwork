@@ -13,11 +13,9 @@ func TestNewID(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
 	if 0 == len(sid) {
 		t.Errorf("Signed ID string was empty")
 	}
-
 	_, err = ValidateID(sid.String(), testSigningKey)
 	if nil != err {
 		t.Fatal(err)

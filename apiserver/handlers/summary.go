@@ -99,7 +99,9 @@ func SummaryHandler(w http.ResponseWriter, r *http.Request) {
 	//   Access-Control-Allow-Origin: *
 	//this will allow JavaScript served from other origins
 	//to call this API
-	w.Header().Add("Access-Control-Allow-Origin", "*")
+
+	//Removed due to being included in mux, middleware now adds this header
+	//w.Header().Add("Access-Control-Allow-Origin", "*")
 
 	//get the `url` query string parameter
 	//if you use r.FormValue() it will also handle cases where
@@ -112,6 +114,7 @@ func SummaryHandler(w http.ResponseWriter, r *http.Request) {
 	//HINT: https://golang.org/pkg/net/http/#Error
 	if url == "" {
 		http.Error(w, "Bad Request: ", http.StatusBadRequest)
+		return
 	} else {
 
 		//call getPageSummary() passing the requested URL
@@ -123,6 +126,7 @@ func SummaryHandler(w http.ResponseWriter, r *http.Request) {
 		//with that error and an http.StatusBadRequest code
 		if err != nil {
 			http.Error(w, "Summary retuend with an error: "+err.Error(), http.StatusBadRequest)
+			return
 		}
 
 		//otherwise, respond by writing the openGrahProps

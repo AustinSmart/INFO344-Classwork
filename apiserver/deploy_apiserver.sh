@@ -23,6 +23,7 @@ sudo docker run --restart unless-stopped --name apiserver -p 443:443 \
 -e DBADDR="mongo" \
 -e REDISADDR="redis:6379" \
 -e SESSIONKEY="khqfkhthrqbfniwhieferjduesHF" \
+-e CHATBOTADDR=tautBot \
 -d austinsmart/info344apiserver
 sudo docker ps -a
 '

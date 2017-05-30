@@ -34,6 +34,8 @@ const (
 
 	apiWebSocket = apiRoot + "websocket"
 
+	apiChatBot = apiRoot + "bot"
+
 	defaultPort = "443"
 )
 
@@ -86,6 +88,7 @@ func main() {
 	mux.HandleFunc(apiMessages, ctx.MessagesHandler)
 	mux.HandleFunc(apiSpecificMessage, ctx.SpecificMessageHandler)
 	mux.HandleFunc(apiWebSocket, ctx.WebSocketUpgradeHandler)
+	mux.HandleFunc(apiChatBot, ctx.ChatBotHandler)
 
 	http.Handle(apiRoot, middleware.Adapt(mux, middleware.CORS("", "", "", "")))
 

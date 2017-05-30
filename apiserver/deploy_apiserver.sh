@@ -4,7 +4,7 @@
 GOOS=linux go build
 
 # Build the docker container
-docker build -t austinsmart/info344apiserver .
+docker build -t austinsmart/info344apiserver . --no-cache
 
 # Push the docker container
 docker push austinsmart/info344apiserver:latest

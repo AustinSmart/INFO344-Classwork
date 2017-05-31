@@ -14,10 +14,10 @@ import (
 //ChatBotHandler lets users ask NLP based questions
 func (ctx *Context) ChatBotHandler(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
-	// if r.Method != "POST" {
-	// 	http.Error(w, "Request type must be POST", http.StatusBadRequest)
-	// 	return
-	// }
+	if r.Method != "POST" {
+		http.Error(w, "Request type must be POST", http.StatusBadRequest)
+		return
+	}
 
 	u := users.User{}
 	s := SessionState{
@@ -39,7 +39,6 @@ func (ctx *Context) ChatBotHandler(w http.ResponseWriter, r *http.Request) {
 			r.URL.Scheme = "http"
 			r.URL.Host = chatBotAddr
 			j, _ := json.Marshal(u)
-			r.Header.Add("User", string(j))
 		},
 	}
 

@@ -22,22 +22,23 @@ if (!witaiToken) {
 const witaiClient = new Wit({ accessToken: witaiToken });
 
 async function handleIntents(req, res, witaiData) {
-	let user = req.headers["user"];
+	let user = JSON.parse(req.headers["user"]);
 	let entities = witaiData.entities;
 	let intents = entities.intent;
 	let message = entities.hasOwnProperty("message");
 	let channel = entities.hasOwnProperty("channel");
+	let channelVal = entities.channel[0].value
 	let most = entities.hasOwnProperty("most");
 	let date = entities.hasOwnProperty("datetime");
 	const defaultResponse = "Sorry, I'm not sure what you are asking. Try asking with different phrasing";
-
+	console.log(JSON.stringify(channelVal));
 	if(intents[0]) {
 		switch (intents[0].value) {
 			//Who hasn't posted to the XYZ channel?
 			case "hasn't":
 			case "who hasnt":
 				if (message && channel) {
-					res.send(chat.hasNotPosted(entities.channel.value));
+					res.send(chat.hasNotPosted(channelVal));
 				} else {
 					res.send(defaultResponse + " Maybe try specifying as channel");
 				}
@@ -45,9 +46,9 @@ async function handleIntents(req, res, witaiData) {
 			//Who has made the most posts to the XYZ channel, Who is in the XYZ channel?
 			case "Who":
 				if(message && most && channel) {
-					res.send(chat.mostPosts(entities.channel.value))
+					res.send(chat.mostPosts(channelVal))
 				} else if(channel) {
-					res.send(chat.members(entities.channel.value));
+					res.send(chat.members(channelVal));
 				} else {
 					res.send(defaultResponse + " Maybe try specifying a channel");
 				}
@@ -55,9 +56,9 @@ async function handleIntents(req, res, witaiData) {
 			//When was my last post?, When was my last post to the XYZ channel?
 			case "When":
 				if(message && channel) {
-					res.send(chat.lastPostInChannel(user, entities.channel.value));
+					res.send(await chat.lastPostInChannel(user, channelVal));
 				} else if (message) {
-					res.send(chat.lastPost(user));
+					res.send(await chat.lastPost(user));
 				} else {
 					res.send(defaultResponse);
 				}
@@ -66,11 +67,11 @@ async function handleIntents(req, res, witaiData) {
 			case "many":
 			case "How many":
 				if(message && channel && date) {
-					res.send(chat.totalMessageInChannelOnDate(user, entities.channel.value, entities.datetime.value))
+					res.send(await chat.totalMessagesInChannelOnDate(user, channelVal, entities.datetime.value))
 				} else if(message && channel){
-					res.send(chat.totalMessagesInChannel(user, entities.channel.value));
+					res.send(await chat.totalMessagesInChannel(user, channelVal));
 				} else if(message) {
-					res.send(chat.totalMessages(user));
+					res.send(await chat.totalMessages(user));
 				} else {
 					res.send(defaultResponse);
 				}

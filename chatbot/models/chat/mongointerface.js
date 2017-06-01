@@ -10,39 +10,42 @@ class MongoInterface {
         this.channelsCollection = channelsCollection;
     }
    
-    hasNotPosted(channel) {
+    async hasNotPosted(channel) {
      	return "You want who hasnt posted to a channel";
     }
 
-    mostPost(channel) {
+    async mostPost(channel) {
 	    return "You want who posted most in a chanel";
     }
 
-    members(channel) {
+    async members(channel) {
         return "You want who is in a channel";
     }
 
-    lastPostInChannel(user, channel) {
+    async lastPostInChannel(user, channel) {
 		return "You want your last post in a channel";
     }
 
-    lastPost(user) {
+    async lastPost(user) {
 	    return "You want your last post";
     }
 
-    totalMessageInChannelOnDate(user, channel, date) {
+    async totalMessagesInChannelOnDate(user, channel, date) {
         return "You want your total messages in a channel at a date";
     }
 
-    totalMessageInChannel(user, channel) {
-        return "You want your total messages in a channel";
+   async totalMessagesInChannel(user, channel) {
+        var CircularJSON = require('circular-json');
+        var channelFromDB = await this.channelsCollection.findOne({name: channel});
+        console.log(CircularJSON.stringify(channelFromDB) + channelFromDB.channelid);
+        var allMsgs = await this.messagesCollection.find({creatorid:user.id}, {channel:channelFromDB.channelid}).toArray();
+        return `You have posted ${allMsgs.length} messages in the ${channel} channel`;
     }
 
-    totalMessages(user) {
-        var allMsgs = this.messagesCollection.find().toArray();
+   async totalMessages(user) {
+        var allMsgs = await this.messagesCollection.find({creatorid:user.id}).toArray();
         return `You have posted ${allMsgs.length} messages`;
     }
-
 }
 
 module.exports = MongoInterface;

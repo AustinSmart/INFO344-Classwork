@@ -1,4 +1,5 @@
 "use strict";
+const defaultResponse = "Sorry, I'm not sure what you are asking. Try asking with different phrasing";
 
 class MongoInterface {
     /** 
@@ -34,16 +35,25 @@ class MongoInterface {
         return "You want your total messages in a channel at a date";
     }
 
-   async totalMessagesInChannel(user, channel) {
+    async totalMessagesInChannel(user, channel) {
         var CircularJSON = require('circular-json');
-        var channelFromDB = await this.channelsCollection.findOne({name: channel});
-        console.log(CircularJSON.stringify(channelFromDB) + channelFromDB.channelid);
-        var allMsgs = await this.messagesCollection.find({creatorid:user.id}, {channel:channelFromDB.channelid}).toArray();
-        return `You have posted ${allMsgs.length} messages in the ${channel} channel`;
+        var channelFromDB = await this.channelsCollection.find(
+            {$or: [{name: new RegExp(channel, "i"), members: user.id}, {name: new RegExp(channel, "i"), private: false}]}
+            ).toArray();
+        if(!channelFromDB[0]) {
+            return "Sorry, I can't find that channel or you do not have access to it.";
+        }
+        console.log(JSON.stringify(user));
+        console.log(CircularJSON.stringify(channelFromDB));
+        var allMsgs = await this.messagesCollection.find({creatorid: user.id, channelid: channelFromDB[0]._id}).toArray();
+        return `You have posted ${allMsgs.length} messages in the "${channelFromDB[0].name}" channel`;
     }
 
    async totalMessages(user) {
-        var allMsgs = await this.messagesCollection.find({creatorid:user.id}).toArray();
+        var allMsgs = await this.messagesCollection.find({creatorid: user.id}).toArray();
+        if(!allMsgs) {
+            return defaultResponse;
+        }
         return `You have posted ${allMsgs.length} messages`;
     }
 }

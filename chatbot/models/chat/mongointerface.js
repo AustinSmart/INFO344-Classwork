@@ -24,27 +24,50 @@ class MongoInterface {
     }
 
     async lastPostInChannel(user, channel) {
-		return "You want your last post in a channel";
+         var channelFromDB = await this.channelsCollection.find(
+            {$or: [{name: new RegExp(channel, "i"), members: user.id}, {name: new RegExp(channel, "i"), private: false}]}
+            ).toArray();
+        if(!channelFromDB[0]) {
+            return "Sorry, I can't find that channel or you do not have access to it.";
+        }
+		 var msg = await this.messagesCollection.find({creatorid: user.id, channelid: channelFromDB[0]._id}).sort({createdat: -1}).limit(1).toArray();
+        if(!msg[0]) {
+            return `Sorry, I could not find your latest message in ${channel}`;
+        }
+	    return `Your last post in "${channelFromDB[0].name}" was ${msg[0].createdat}`;
     }
 
     async lastPost(user) {
-	    return "You want your last post";
+        var msg = await this.messagesCollection.find({creatorid: user.id}).sort({createdat: -1}).limit(1).toArray();
+        if(!msg[0]) {
+            return "Sorry, I could not find your latest message";
+        }
+	    return `Your last post was ${msg[0].createdat}`;
     }
 
     async totalMessagesInChannelOnDate(user, channel, date) {
-        return "You want your total messages in a channel at a date";
-    }
-
-    async totalMessagesInChannel(user, channel) {
-        var CircularJSON = require('circular-json');
+        console.log("DATE: " + new Date(date));
         var channelFromDB = await this.channelsCollection.find(
             {$or: [{name: new RegExp(channel, "i"), members: user.id}, {name: new RegExp(channel, "i"), private: false}]}
             ).toArray();
         if(!channelFromDB[0]) {
             return "Sorry, I can't find that channel or you do not have access to it.";
         }
-        console.log(JSON.stringify(user));
-        console.log(CircularJSON.stringify(channelFromDB));
+        var allMsgs = await this.messagesCollection.find(
+            {creatorid: user.id, 
+            channelid: channelFromDB[0]._id, 
+            createdat: new Date(date).toISOString()})
+            .toArray();
+        return `You posted ${allMsgs.length} messages in the "${channelFromDB[0].name}" channel on ${new Date(date)}`;
+    }
+
+    async totalMessagesInChannel(user, channel) {
+        var channelFromDB = await this.channelsCollection.find(
+            {$or: [{name: new RegExp(channel, "i"), members: user.id}, {name: new RegExp(channel, "i"), private: false}]}
+            ).toArray();
+        if(!channelFromDB[0]) {
+            return "Sorry, I can't find that channel or you do not have access to it.";
+        }
         var allMsgs = await this.messagesCollection.find({creatorid: user.id, channelid: channelFromDB[0]._id}).toArray();
         return `You have posted ${allMsgs.length} messages in the "${channelFromDB[0].name}" channel`;
     }

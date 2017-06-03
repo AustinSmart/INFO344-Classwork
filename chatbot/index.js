@@ -24,7 +24,6 @@ const witaiClient = new Wit({ accessToken: witaiToken });
 async function handleIntents(req, res, witaiData) {
 	let user = JSON.parse(req.headers["user"]);
 	let entities = witaiData.entities;
-	console.log(JSON.stringify(entities));
 	let intents = entities.intent;
 	let message = entities.hasOwnProperty("message");
 	let channel = entities.hasOwnProperty("channel");
@@ -37,7 +36,7 @@ async function handleIntents(req, res, witaiData) {
 			case "hasn't":
 			case "who hasnt":
 				if (message && channel) {
-					res.send(chat.hasNotPosted(entities.channel[0].value));
+					res.send(await chat.hasNotPosted(user, entities.channel[0].value));
 				} else {
 					res.send(defaultResponse + " Maybe try specifying as channel");
 				}
@@ -45,9 +44,9 @@ async function handleIntents(req, res, witaiData) {
 			//Who has made the most posts to the XYZ channel, Who is in the XYZ channel?
 			case "Who":
 				if(message && most && channel) {
-					res.send(chat.mostPosts(entities.channel[0].value))
+					res.send(await chat.mostPosts(user, entities.channel[0].value))
 				} else if(channel) {
-					res.send(chat.members(centities.channel[0].value));
+					res.send(await chat.members(user, entities.channel[0].value));
 				} else {
 					res.send(defaultResponse + " Maybe try specifying a channel");
 				}
@@ -95,15 +94,20 @@ app.post("/v1/bot", (req, res, next) => {
 	.catch(next);
 });
 
-var messagesUrl = 'mongodb://mongo/messages-db';
-MongoClient.connect(messagesUrl).then(db =>  {
-  console.log("Connected successfully to messages-db");
-  let messagesCollection = db.collection('messages');
-  let channelsCollection = db.collection('channels');
-  chat = new ChatInterface(messagesCollection, channelsCollection);
-  app.listen(port, host, () => {
+connectAndListen();
+
+//Connect to the mongo databases
+async function connectAndListen() {
+	var messagesUrl = 'mongodb://mongo/messages-db';
+	var usersUrl = 'mongodb://mongo/users-db';
+	var messagesDB = await MongoClient.connect(messagesUrl);
+	var usersDB = await MongoClient.connect(usersUrl);
+	var usersCollection = usersDB.collection('users');
+	var messagesCollection = messagesDB.collection('messages');
+	var channelsCollection = messagesDB.collection('channels');
+
+	chat = new ChatInterface(usersCollection, messagesCollection, channelsCollection);
+	app.listen(port, host, () => {
 		console.log(`server is listening at http://${host}:${port}`);
 	});
-}).catch(err => {
-	console.log(err);
-});
+}

@@ -113,7 +113,7 @@ func (ms *MongoStore) UpdateChannel(updates *ChannelUpdates, channel ChannelID) 
 
 //UpdateMessage updates a messages body
 func (ms *MongoStore) UpdateMessage(updates *MessageUpdates, message MessageID) error {
-	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Update(bson.M{"_id": message}, bson.M{"$set": bson.M{"body": updates.Body, "editedat": time.Now().String()}})
+	err := ms.Session.DB(ms.DatabaseName).C(ms.MessagesCollectionName).Update(bson.M{"_id": message}, bson.M{"$set": bson.M{"body": updates.Body, "editedat": time.Now()}})
 	if err == mgo.ErrNotFound {
 		return ErrMessageNotFound
 	}

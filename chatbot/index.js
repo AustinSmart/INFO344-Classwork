@@ -65,10 +65,10 @@ async function handleIntents(req, res, witaiData) {
 			case "many":
 			case "How many":
 				if(message && channel && date) {
-					if(!entities.datetime[0].values[0].value) {
+					if(!entities.datetime[0].value) {
 						res.send(defaultResponse);
 					}
-					res.send(await chat.totalMessagesInChannelOnDate(user, entities.channel[0].value, entities.datetime[0].values[0].value))
+					res.send(await chat.totalMessagesInChannelOnDate(user, entities.channel[0].value, entities.datetime[0].value))
 				} else if(message && channel){
 					res.send(await chat.totalMessagesInChannel(user, entities.channel[0].value));
 				} else if(message) {
@@ -78,7 +78,7 @@ async function handleIntents(req, res, witaiData) {
 				}
 				break;
 			default:
-				res.Send(defaultResponse);
+				res.Send(defaultResponse); 
 		} 
 	}
 }

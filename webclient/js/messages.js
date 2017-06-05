@@ -69,7 +69,6 @@ window.onload = function() {
     var websocket = new WebSocket(webSocketConnection + apiRoot+ "websocket?" + headerAuthorization + "=" + localStorage.getItem(headerAuthorization));
     websocket.onmessage =  function(wsevent) {
         var msg = JSON.parse(event.data);
-        console.log(msg);
         switch(msg.type) {
             case "New Message":
             case "Message Updated":
@@ -299,28 +298,52 @@ function signOut() {
 }
 
 function addMessage(body) {
-    var message = {
-        channelID: currentChannelID,
-	    body: body
-    }
 
-    headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
-    fetch(httpConnection + apiRoot + "messages",
-        {
-            method: "POST",
-            headers: headers,
-            body: JSON.stringify(message)
-        }).then(function(res){
-           if(res.ok) {
-                return res.json();
-            } else {
-                res.text().then(function (text) {
-                    alert("Error: " + text);
-                });
-            }
-        }).catch(function(err) {
-            alert(err);
-        });
+    if(!body.startsWith("bot:")) {
+        var message = {
+            channelID: currentChannelID,
+            body: body
+        }
+
+        headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
+        fetch(httpConnection + apiRoot + "messages",
+            {
+                method: "POST",
+                headers: headers,
+                body: JSON.stringify(message)
+            }).then(function(res){
+                if(res.ok) {
+                    return res.json();
+                } else {
+                    res.text().then(function (text) {
+                        alert("Error: " + text);
+                    });
+                }
+            }).catch(function(err) {
+                alert(err);
+            });
+    } else {
+        //CHATBOT
+        headers.set(headerAuthorization, localStorage.getItem(headerAuthorization));
+        fetch(httpConnection + apiRoot + "bot",
+            {
+                method: "POST",
+                headers: headers,
+                body: body
+            }).then(function(res){
+                if(res.ok) {
+                    return res.text();
+                } else {
+                    res.text().then(function (text) {
+                        alert("Error: " + text);
+                    });
+                }
+            }).then(function(res) {
+                alert(res);
+            }).catch(function(err) {
+                alert(err);
+            });
+    }
 }
 
 function renderSidebar() {

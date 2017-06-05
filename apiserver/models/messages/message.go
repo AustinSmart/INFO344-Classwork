@@ -14,7 +14,7 @@ type Message struct {
 	ID              MessageID    `json:"id" bson:"_id"`
 	ChannelID       ChannelID    `json:"channelID"`
 	Body            string       `json:"body"`
-	CreatedAt       string       `json:"createdAt"`
+	CreatedAt       time.Time    `json:"createdAt"`
 	CreatorID       users.UserID `json:"creatorID"`
 	CreatorName     string       `json:"creatorName"`
 	CreatorPhotoURL string       `json:"creatorPhotoUrl"`
@@ -37,7 +37,7 @@ func (nm *NewMessage) ToMessage() *Message {
 	m := Message{
 		ChannelID: nm.ChannelID,
 		Body:      nm.Body,
-		CreatedAt: time.Now().String(),
+		CreatedAt: time.Now(),
 	}
 	return &m
 }

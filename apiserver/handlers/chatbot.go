@@ -39,6 +39,7 @@ func (ctx *Context) ChatBotHandler(w http.ResponseWriter, r *http.Request) {
 			r.URL.Scheme = "http"
 			r.URL.Host = chatBotAddr
 			j, _ := json.Marshal(u)
+			r.Header.Add("User", string(j))
 		},
 	}
 

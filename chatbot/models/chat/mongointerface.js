@@ -1,6 +1,7 @@
 "use strict";
 const defaultResponse = "Sorry, I'm not sure what you are asking. Try asking with different phrasing";
 const CirularJSON = require('circular-json');
+const moment = require('moment');
 
 class MongoInterface {
     /** 
@@ -104,21 +105,19 @@ class MongoInterface {
         }
 	    return `Your last post was ${msg[0].createdat}`;
     }
-    //TODO
+
     async totalMessagesInChannelOnDate(user, channel, date) {
-        console.log("DATE: " + new Date(date));
         var channelFromDB = await this.channelsCollection.find(
             {$or: [{name: new RegExp(channel, "i"), members: user.id}, {name: new RegExp(channel, "i"), private: false}]}
             ).toArray();
         if(!channelFromDB[0]) {
             return "Sorry, I can't find that channel or you do not have access to it.";
         }
-        var allMsgs = await this.messagesCollection.find(
-            {creatorid: user.id, 
-            channelid: channelFromDB[0]._id, 
-            createdat: new Date(date).toISOString()})
-            .toArray();
-        return `You posted ${allMsgs.length} messages in the "${channelFromDB[0].name}" channel on ${new Date(date)}`;
+        let startDate = moment(date).toDate();
+        let endDate = moment(startDate).add(24, 'hours').toDate();
+        let messages = await this.messagesCollection.find({channelid: channelFromDB[0]._id, createdat: {$gte : startDate, $lt: endDate}}).toArray();
+        return `You posted ${messages.length} times in "${channelFromDB[0].name}" on ${date}`;
+        
     }
 
     async totalMessagesInChannel(user, channel) {
